@@ -14,7 +14,7 @@ The objective is to develop several LF programs incorporating multiple reactors,
 
 The AI algorithms to be included in the library are as follows:
 
-- **Audio.lf**
+- **[Audio.lf](src/Audio.lf)**
     - [x] AudioClassifier
 - **ComputerVision.lf**
     - [ ] ImageClassifier
