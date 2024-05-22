@@ -1,18 +1,11 @@
 target Python
 
-reactor Microphone {
+reactor Microphone(buffer_size=15600, sample_rate=16000, channels=1) {
     physical action send_audio_data
     output audio_data
   
     state audio_capture_thread
     state thread_should_be_running
-  
-    state buffer_size
-    state sample_rate
-    state num_channels
-    state overlapping_factor
-    state input_length_in_samples
-    state interval_between_inference
   
     preamble {=
       import time as tm
@@ -26,10 +19,10 @@ reactor Microphone {
               if status:
                   print(status)
                   
-              input_data = self.np.array(indata, dtype=self.np.float32)[:self.buffer_size].reshape((1, self.buffer_size))
+              input_data = indata.astype(self.np.float32)
               audio_action.schedule(0, input_data)
   
-          with self.sd.InputStream(channels=self.num_channels, samplerate=self.sample_rate, callback=callback, blocksize=self.buffer_size) as stream:
+          with self.sd.InputStream(channels=self.channels, samplerate=self.sample_rate, callback=callback, blocksize=self.buffer_size) as stream:
               print("#" * 50)
               print("Recording started. Press Enter to stop")
               print("#" * 50)
@@ -40,11 +33,6 @@ reactor Microphone {
     =}
   
     reaction(startup) -> send_audio_data {=
-      # Setup Audio recorders
-      self.buffer_size, self.sample_rate, self.num_channels, self.overlapping_factor = 15600, 16000, 1, 0.5
-      self.input_length_in_samples =self. buffer_size
-      self.interval_between_inference = self.input_length_in_samples * (1 - self.overlapping_factor)
-  
       # Launch Audio Capture Thread
       self.thread_should_be_running = self.threading.Event()
       self.thread_should_be_running.set()

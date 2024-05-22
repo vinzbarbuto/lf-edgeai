@@ -1,52 +1,65 @@
 target Python
 
-reactor AudioClassifier(model_path="", labels_file="", output_index=0) {
-    state interpreter;
-    state input_details;
-    state output_details;
-    state labels;
+reactor AudioClassifier(model="", max_results=5, score_threshold=0.0, num_threads=4, enable_edgetpu=False) {
+    state classifier;
+    state tensor_audio;
 
     input input_data;
-    output label;
-    output confidence;
+    
+    output results;
     output inference_time;
 
     preamble {=
-        import tensorflow as tf
-        import os
-        import numpy as np
+        from tflite_support.task import audio
+        from tflite_support.task import core
+        from tflite_support.task import processor
+        
+        import time
+
+        def collect_results(self, classifications):
+            results_list = []
+            for classification in classifications:
+                results_list.append({
+                    "label": classification.categories[0].category_name,
+                    "score": classification.categories[0].score,
+                    "head": classification.head_name
+                })
+            return results_list;
+
+
+
     =}
 
     reaction(startup) {=
-        if(self.model_path == ""):
+        if(self.model == ""):
             print("Error: Please provide a valid model path")
             request_stop()
-        elif(self.labels_file == ""):
-            print("Error: Please provide a valid labels file")
-            request_stop()
         else:
-            # Load model
-            print(f"Loading model from: {self.model_path}")
-            self.interpreter = self.tf.lite.Interpreter(model_path=self.model_path)
-            self.interpreter.allocate_tensors()
-            self.input_details = self.interpreter.get_input_details()
-            self.output_details = self.interpreter.get_output_details()
-            # Load labels
-            self.labels = self.np.genfromtxt(self.labels_file, dtype=str, delimiter="\n")
+            # Initialize the audio classification model.
+            base_options = self.core.BaseOptions(
+                file_name=self.model, use_coral=self.enable_edgetpu, num_threads=self.num_threads)
+            classification_options = self.processor.ClassificationOptions(
+                max_results=self.max_results, score_threshold=self.score_threshold)
+            options = self.audio.AudioClassifierOptions(
+                base_options=base_options, classification_options=classification_options)
+            self.classifier = self.audio.AudioClassifier.create_from_options(options)
+
+            self.tensor_audio = self.classifier.create_input_tensor_audio()
     =}
 
-    reaction(input_data) -> label, inference_time, confidence {=
+    reaction(input_data) -> results, inference_time {=
         # Run inference
-        self.interpreter.set_tensor(self.input_details[0]["index"], input_data.value[0])
+        self.tensor_audio.load_from_array(input_data.value)
+        # Load the input audio and run classify.
         start = lf.time.physical()
-        self.interpreter.invoke()
-        inference_tm = lf.time.physical() - start
-        # Get output results
-        results = self.interpreter.get_tensor(self.output_details[self.output_index]["index"])
-        result_index = results.argmax()
-        label.set(self.labels[result_index])
-        inference_time.set(inference_tm)
-        confidence.set(format(results[0][result_index]*100, ".2f"))
+        result = self.classifier.classify(self.tensor_audio)
+        end = (lf.time.physical() - start) / 1000000
+        # classification = result.classifications[0]
+        # category_name = classification.categories[0].category_name
+        # score = classification.categories[0].score * 100
+        # print(f"Label: {category_name} | Confidence: {score:.2f}% | Time elapsed: {end:.2f} ms")
+        results.set(self.collect_results(result.classifications))
+        inference_time.set(end)
     =}
 
     reaction(shutdown) {=
