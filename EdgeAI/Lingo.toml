@@ -1,0 +1,15 @@
+app = []
+
+[package]
+name = "EdgeAI"
+version = "0.1.0"
+
+[properties]
+
+[lib]
+name = "EdgeAI"
+main = ""
+target = "Python"
+platform = "Native"
+
+[dependencies]
