@@ -10,8 +10,12 @@ However, recent advancements in edge device hardware and model reduction techniq
 
 ## Library Implementation
 
-The goal is to develop several LF programs that incorporates multiple reactors, each implementing a specific AI algorithm optimized for edge devices. All AI algorithms will utilize TensorFlow Lite, a set of tools designed to enable on-device machine learning by allowing developers to run their models on mobile, embedded, and edge devices. The AI algorithms to be included in the library are as follows:
+The objective is to develop several LF programs incorporating multiple reactors, each implementing a specific AI algorithm optimized for edge devices. These AI algorithms will utilize [TensorFlow Lite](https://www.tensorflow.org/lite/guide), a suite of tools designed for on-device machine learning, enabling developers to run models on mobile, embedded, and edge devices. Specifically, each algorithm will leverage the [TensorFlow Lite Task Library](https://www.tensorflow.org/lite/inference_with_metadata/task_library/overview), which consists of powerful and user-friendly task-specific libraries that facilitate the creation of ML experiences with TFLite. This library offers optimized out-of-the-box model interfaces for popular machine learning tasks, such as image classification and question answering. These model interfaces are designed to maximize performance and usability for each specific task.
 
+The AI algorithms to be included in the library are as follows:
+
+- **Audio.lf**
+    - [x] AudioClassifier
 - **ComputerVision.lf**
     - [ ] ImageClassifier
     - [ ] ImageSegmenter
@@ -24,5 +28,3 @@ The goal is to develop several LF programs that incorporates multiple reactors, 
     - [ ] BertQuestionAnswer
     - [ ] TextSearcher
     - [ ] TextEmbedder
-- **Audio.lf**
-    - [x] AudioClassifier
