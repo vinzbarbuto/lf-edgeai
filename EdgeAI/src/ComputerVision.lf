@@ -1,0 +1,21 @@
+target Python
+
+reactor ImageClassifier {
+    // TODO
+}
+
+reactor ImageSegmenter {
+    // TODO
+}
+
+reactor ObjectDetector {
+    // TODO
+} 
+
+reactor ImageSearcher {
+    // TODO
+}
+
+reactor ImageEmbedder {
+    // TODO
+}

@@ -1,0 +1,26 @@
+target Python
+
+reactor NLClassifier {
+    // TODO
+}
+
+
+reactor BertNLClassifier {
+    // TODO
+}
+
+
+reactor BertQuestionAnswer {
+    // TODO
+}
+
+
+reactor TextSearcher {
+    // TODO
+}
+
+
+reactor TextEmbedder {
+    // TODO
+}
+
