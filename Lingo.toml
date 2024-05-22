@@ -1,5 +1,3 @@
-app = []
-
 [package]
 name = "EdgeAI"
 version = "0.1.0"
@@ -8,8 +6,10 @@ version = "0.1.0"
 
 [lib]
 name = "EdgeAI"
-main = ""
+main = "./src/Audio.lf"
 target = "Python"
 platform = "Native"
+
+[lib.properties]
 
 [dependencies]
