@@ -1,0 +1,5 @@
+bin
+build
+src-gen
+include
+.DS_Store
