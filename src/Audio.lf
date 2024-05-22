@@ -54,10 +54,6 @@ reactor AudioClassifier(model="", max_results=5, score_threshold=0.0, num_thread
         start = lf.time.physical()
         result = self.classifier.classify(self.tensor_audio)
         end = (lf.time.physical() - start) / 1000000
-        # classification = result.classifications[0]
-        # category_name = classification.categories[0].category_name
-        # score = classification.categories[0].score * 100
-        # print(f"Label: {category_name} | Confidence: {score:.2f}% | Time elapsed: {end:.2f} ms")
         results.set(self.collect_results(result.classifications))
         inference_time.set(end)
     =}
