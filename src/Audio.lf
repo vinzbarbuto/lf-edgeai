@@ -24,6 +24,7 @@ target Python
 *    @author Vincenzo Barbuto
 *
 */
+
 reactor AudioClassifier(model="", max_results=5, score_threshold=0.0, num_threads=4, enable_edgetpu=False) {
     state classifier;
     state tensor_audio;
