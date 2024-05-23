@@ -14,17 +14,22 @@ The objective is to develop several LF programs incorporating multiple reactors,
 
 The AI algorithms to be included in the library are as follows:
 
-- **[Audio.lf](src/Audio.lf)**
-    - [x] AudioClassifier
-- **ComputerVision.lf**
-    - [ ] ImageClassifier
-    - [ ] ImageSegmenter
-    - [ ] ObjectDetector
-    - [ ] ImageSearcher (?)
-    - [ ] ImageEmbedder (?)
-- **NLP.lf**
-    - [ ] NLClassifier
-    - [ ] BertNLClassifier
-    - [ ] BertQuestionAnswer
-    - [ ] TextSearcher
-    - [ ] TextEmbedder
+- **[`Audio.lf`](src/Audio.lf)**
+    - [x] `AudioClassifier`
+- **[`ComputerVision.lf`](src/ComputerVision.lf)**
+    - [ ] `ImageClassifier`
+    - [ ] `ImageSegmenter`
+    - [ ] `ObjectDetector`
+    - [ ] `ImageSearcher` (?)
+    - [ ] `ImageEmbedder` (?)
+- **[`NLP.lf`](src/NLP.lf)**
+    - [ ] `NLClassifier`
+    - [ ] `BertNLClassifier`
+    - [ ] `BertQuestionAnswer`
+    - [ ] `TextSearcher`
+    - [ ] `TextEmbedder`
+
+For each specific task library, a machine learning model is provided in the [`models`](models/) folder. However, you can train and use your own model with the single reactor. Just be sure to carefully read the documentation for the specific library task API you intend to use to verify model compatibility. Regardless of the model you use, it is important to specify the model's absolute path when instantiating a reactor library in your main reactor. For example:
+```Python
+cls = new AudioClassifier(model="/absolute/path/to/model.tflite");
+```
