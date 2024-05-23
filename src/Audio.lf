@@ -1,5 +1,28 @@
 target Python
 
+/*
+Reactor that performs audio classification using a TensorFlow Lite model.
+
+Args:
+    model (str): Absolute path to the TensorFlow Lite model file.
+    max_results (int): Maximum number of classification results to return.
+    score_threshold (float): Minimum score threshold for classification results.
+    num_threads (int): Number of CPU threads to use for inference.
+    enable_edgetpu (bool): Whether to use the Edge TPU for inference.
+
+Inputs:
+    input_data (numpy.ndarray): Audio data to be classified.
+
+Outputs:
+    results (list[dict]): List of classification results, where each result is a dictionary with the following keys:
+        - label (str): Class label of the classification result.
+        - score (float): Confidence score of the classification result.
+        - head (str): Name of the classification head.
+    inference_time (float): Time taken to perform the classification, in milliseconds.
+
+    @author Vincenzo Barbuto
+
+*/
 reactor AudioClassifier(model="", max_results=5, score_threshold=0.0, num_threads=4, enable_edgetpu=False) {
     state classifier;
     state tensor_audio;
