@@ -1,0 +1,51 @@
+/**
+ * @file MLReactor.lf
+ * @author Vincenzo Barbuto
+*/
+
+target Python
+
+/**
+ * The `MLReactor` reactor is the parent reactor for all other AI algorithms. It provides a unified
+ * interface for executing machine learning models and processing their outputs.
+ * 
+ * Args:
+ *     model (str): The path to the machine learning model.
+ *     max_results (int): The maximum number of results to return for each input.
+ *     score_threshold (float): The minimum confidence score required for a result to be included in the output.
+ *     num_threads (int): The number of threads to use for parallel processing of inputs.
+ *     enable_edgetpu (bool): Whether to enable the use of the Edge TPU for accelerated inference.
+ * 
+ * Inputs:
+ *     input_data (Any): The input data to be classified or processed (e.g. image, audio, etc.).
+ * 
+ * Outputs:
+ *     results (list[dict]): A list containing the output results for each input.
+ *     inference_time (float): Time taken to perform the classification, in milliseconds.
+*/
+
+reactor MLReactor(
+    model="",
+    max_results=2,
+    score_threshold=0.0,
+    num_threads=4,
+    enable_edgetpu=False) {
+
+    state classifier;
+    state tensor_input;
+    state base_options;
+    
+    input input_data;
+    
+    output results;
+    output inference_time;
+
+    preamble {=
+        from tflite_support.task import core
+    =}
+
+    reaction(startup) {=
+        self.base_options = self.core.BaseOptions(file_name=self.model, use_coral=self.enable_edgetpu, num_threads=self.num_threads)
+    =}
+
+}

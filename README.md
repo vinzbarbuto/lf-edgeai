@@ -17,7 +17,7 @@ The AI algorithms to be included in the library are as follows:
 - **[`Audio.lf`](src/Audio.lf)**
     - [x] `AudioClassifier`
 - **[`ComputerVision.lf`](src/ComputerVision.lf)**
-    - [ ] `ImageClassifier`
+    - [x] `ImageClassifier`
     - [ ] `ImageSegmenter`
     - [ ] `ObjectDetector`
     - [ ] `ImageSearcher` (?)
