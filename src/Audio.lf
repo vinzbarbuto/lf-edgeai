@@ -21,7 +21,7 @@ target Python
 *        - head (str): Name of the classification head.
 *    inference_time (float): Time taken to perform the classification, in milliseconds.
 *
-*    @author Vincenzo Barbuto
+* @author Vincenzo Barbuto
 *
 */
 
