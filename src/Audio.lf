@@ -63,9 +63,9 @@ reactor AudioClassifier extends MLReactor {
             max_results=self.max_results, score_threshold=self.score_threshold)
         options = self.audio.AudioClassifierOptions(
             base_options=self.base_options, classification_options=classification_options)
-        self.classifier = self.audio.AudioClassifier.create_from_options(options)
+        self.executor = self.audio.AudioClassifier.create_from_options(options)
 
-        self.tensor_input = self.classifier.create_input_tensor_audio()
+        self.tensor_input = self.executor.create_input_tensor_audio()
   =}
 
   reaction(input_data) -> results, inference_time {=
@@ -74,7 +74,7 @@ reactor AudioClassifier extends MLReactor {
         self.tensor_input.load_from_array(input_data.value)
         # Load the input audio and run classify.
         start = lf.time.physical()
-        result = self.classifier.classify(self.tensor_input)
+        result = self.executor.classify(self.tensor_input)
         end = (lf.time.physical() - start) / 1000000
         results.set(self.collect_results(result.classifications))
         inference_time.set(end)

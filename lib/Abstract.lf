@@ -31,7 +31,7 @@ reactor MLReactor(
     num_threads=4,
     enable_edgetpu=False) {
 
-    state classifier;
+    state executor;
     state tensor_input;
     state base_options;
     

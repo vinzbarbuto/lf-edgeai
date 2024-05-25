@@ -18,18 +18,18 @@ The AI algorithms to be included in the library are as follows:
     - [x] `AudioClassifier`
 - **[`ComputerVision.lf`](src/ComputerVision.lf)**
     - [x] `ImageClassifier`
-    - [ ] `ImageSegmenter`
-    - [ ] `ObjectDetector`
-    - [ ] `ImageSearcher` (?)
-    - [ ] `ImageEmbedder` (?)
+    - [x] `ImageSegmenter`
+    - [x] `ObjectDetector`
+    <!-- - [ ] `ImageSearcher` (?)
+    - [ ] `ImageEmbedder` (?) -->
 - **[`NLP.lf`](src/NLP.lf)**
     - [ ] `NLClassifier`
     - [ ] `BertNLClassifier`
     - [ ] `BertQuestionAnswer`
-    - [ ] `TextSearcher`
-    - [ ] `TextEmbedder`
+    <!-- - [ ] `TextSearcher`
+    - [ ] `TextEmbedder` -->
 
-For each specific task library, a machine learning model is provided in the [`models/`](models/) folder. However, you can train and use your own model with the single reactor. Just be sure to carefully read the documentation for the specific library task API you intend to use to verify model compatibility. Regardless of the model you use, it is important to specify the model's absolute path when instantiating a reactor library in your main reactor. For example:
+For each specific task library, a machine learning model is provided in the [`models/`](models/) folder. However, you can train and use your own model with the single reactor. Just be sure to carefully read the [documentation](https://www.tensorflow.org/lite/inference_with_metadata/task_library/overview) for the specific library task API you intend to use to verify model compatibility. Regardless of the model you use, it is important to specify the model's absolute path when instantiating a reactor library in your main reactor. For example:
 ```Python
 cls = new AudioClassifier(model="/absolute/path/to/model.tflite");
 ```
