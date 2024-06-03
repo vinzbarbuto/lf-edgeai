@@ -1,0 +1,61 @@
+/**
+ * @file
+ * @author Vincenzo Barbuto
+ * @brief Examples of how to use the Image Segmentation reactor.
+ */
+
+target Python
+
+import ImageSegmenter from "../lib/ComputerVision.lf"
+
+/**
+ * @brief Injects an image into the image segmentation pipeline.
+ *
+ * The ImageInjector reactor reads an image from the specified file path and outputs it to the
+ * `image_data` port. This allows the image to be consumed by other reactors in the pipeline, such
+ * as the ImageSegmenter.
+ *
+ * The ActuatorTest reactor receives the segmentation results and inference time from the
+ * ImageSegmenter and prints them to the console.
+ 
+ * The main reactor wires up the `ImageInjector`, `ImageSegmenter`, and `ActuatorTest` reactors together.
+ * The ImageInjector reactor outputs the image data to the ImageSegmenter reactor. The
+ * ImageSegmenter reactor outputs the detected results and inference time to the ActuatorTest
+ * reactor.
+ *
+ * @note Remember to set the `model` parameter to the absolute path of the image segmentation model you want to use, 
+ * as well as the `img_path` parameter to the absolute path of the image file you want to use.
+ */
+reactor ImageInjector(img_path="") {
+  output image_data
+
+  preamble {=
+    import cv2
+  =}
+
+  reaction(startup) -> image_data {=
+    img = self.cv2.imread(self.img_path)
+    image_data.set(img)
+  =}
+}
+
+reactor ActuatorTest {
+  input input1
+  input input2
+
+  reaction(input1, input2) {=
+    results = input1.value
+    print("-"*70)
+    for i, result in enumerate(results):
+        print(f"{i}) Segment: {result['segment']}")
+    print(f"Time per inference: {input2.value} ms")
+  =}
+}
+
+main reactor {
+  inj = new ImageInjector(img_path="/path/to/image.png")
+  sgm = new ImageSegmenter(model="/path/to/model.tflite")
+  actuator = new ActuatorTest()
+  inj.image_data -> sgm.input_data
+  sgm.results, sgm.inference_time -> actuator.input1, actuator.input2
+}

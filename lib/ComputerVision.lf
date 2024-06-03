@@ -1,18 +1,19 @@
 /**
- * File containing Library of Reactor Components for Computer Vision tasks. This library provides a
+ * @file 
+ * @brief File containing Library of Reactor Components for Computer Vision tasks. This library provides a
  * set of reusable components for performing various computer vision tasks, such as image
- * classification, object detection, image segmentation, and image search.
+ * classification, object detection, and image segmentation
  *
  * @author Vincenzo Barbuto
  */
 
 target Python
 
-import MLReactor from "../lib/Abstract.lf"
+import MLReactor from "../lib/AbstractReactors.lf"
 
 
 /**
- * Reactor that extends `MLReactor` performing image classification using a TensorFlow Lite model.
+ * @brief Reactor that extends `MLReactor` performing image classification using a TensorFlow Lite model.
  *
  * Args:
  *    model (str): Absolute path to the TensorFlow Lite model file.

@@ -1,0 +1,60 @@
+/**
+ * @file
+ * @author Vincenzo Barbuto
+ * @brief Examples of how to use the Image Classification reactor.
+ */
+
+target Python
+
+import ImageClassifier from "../lib/ComputerVision.lf"
+
+/**
+ * @brief Defines an ImageInjector reactor that reads an image from a file path and outputs the image data.
+ * The image path is specified as a parameter to the ImageInjector reactor.
+ *
+ * The ActuatorTest reactor takes the image classification results and inference time as inputs, and
+ * prints the results. It prints the top classification results along with their labels, indices,
+ * and confidence scores. It also prints the time taken for each inference in milliseconds.
+ *
+ * The main reactor wires up the `ImageInjector`, `ImageClassifier`, and `ActuatorTest` reactors together.
+ * The ImageInjector reactor outputs the image data to the ImageClassifier reactor. The
+ * ImageClassifier reactor outputs the classification results and inference time to the ActuatorTest
+ * reactor.
+ *
+ * @note Remember to set the `model` parameter to the absolute path of the image classification model you want to use, 
+ * as well as the `img_path` parameter to the absolute path of the image file you want to use.
+ */
+
+reactor ImageInjector(img_path="") {
+    output image_data;
+
+    preamble {=
+        import cv2
+    =}
+
+    reaction(startup) -> image_data {=
+        img = self.cv2.imread(self.img_path)
+        image_data.set(img)
+    =}
+}
+
+reactor ActuatorTest {
+    input input1
+    input input2
+
+    reaction(input1, input2) {=
+        results = input1.value
+        print("-"*70)
+        for i, result in enumerate(results):
+            print(f"{i}) Head: {result['head']}; Index: {result['index']}; Class: {result['label']}; Confidence: {result['score']*100:.2f}%")
+        print(f"Time per inference: {input2.value} ms")
+    =}
+}
+
+main reactor {
+    inj = new ImageInjector(img_path="/path/to/image.png");
+    cls = new ImageClassifier(model="/path/to/model.tflite");
+    actuator = new ActuatorTest();
+    inj.image_data -> cls.input_data;
+    cls.results, cls.inference_time -> actuator.input1, actuator.input2;
+}

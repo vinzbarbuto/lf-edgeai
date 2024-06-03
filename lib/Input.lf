@@ -1,0 +1,71 @@
+/**
+ * @file
+ * @author Vincenzo Barbuto
+ * @author Edward A. Lee
+ * @brief Interface library for input devices such as microphones, cameras, and other sensors.
+ */
+
+target Python
+
+/**
+ * @brief The `Microphone` reactor is responsible for capturing real-time audio data from a
+ * microphone device and emitting it as an output.
+ * 
+ * It uses the `sounddevice` library to open an audio input stream, and provides a callback function that is 
+ * called whenever new audio data is available. The recorded audio data is then scheduled to be emitted through 
+ * the `audio_data` output.
+ * 
+ * Args:
+ *     buffer_size (int): The size of the audio buffer in samples.
+ *     sample_rate (int): The sample rate of the audio in Hz.
+ *     channels (int): The number of audio channels.
+ *     device (Optional[int]): The audio device to use for recording, or `None` to use the default device.
+ * 
+ * Reactions:
+ *     startup: Starts the audio input stream and begins recording audio.
+ *     send_audio_data: Emits the recorded audio data through the `audio_data` output.
+ *     shutdown: Stops the audio input stream and shuts down the reactor.
+*/
+
+reactor Microphone(buffer_size=15600, sample_rate=16000, channels=1, device = {= None =}) {
+    physical action send_audio_data
+    output audio_data
+  
+    state stream
+  
+    preamble {=
+      import sounddevice as sd
+      import numpy as np
+    =}
+  
+    reaction(startup) -> send_audio_data {=
+
+      def callback(indata, frames, time, status):
+        if status:
+          print(status)
+        input_data = indata.astype(self.np.float32)
+        send_audio_data.schedule(0, input_data)
+
+      self.stream = self.sd.InputStream(
+        channels=self.channels, 
+        samplerate=self.sample_rate, 
+        blocksize=self.buffer_size,
+        callback=callback,
+        device=self.device)
+      self.stream.start()
+      print("#" * 50)
+      print("Recording started")
+      print("#" * 50)
+
+    =}
+  
+    reaction(send_audio_data) -> audio_data {=
+      audio_data.set(send_audio_data.value)
+    =}
+  
+    reaction(shutdown) {=
+      if self.stream:
+        self.stream.stop()
+      print("Shutting down Microphone reactor")
+    =}
+  }
