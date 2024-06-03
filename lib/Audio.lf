@@ -14,7 +14,7 @@ import MLReactor from "../lib/AbstractReactors.lf"
 
 /**
  *
- * @brief Reactor that extends `Classifier` reactor performing audio classification using a TensorFlow Lite model.
+ * @brief Reactor that extends `MLReactor` reactor performing audio classification using a TensorFlow Lite model.
  *
  * Args:
  *    model (str): Absolute path to the TensorFlow Lite model file.
