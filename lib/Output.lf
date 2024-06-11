@@ -1,7 +1,13 @@
+/**
+ * @file
+ * @author Vincenzo Barbuto
+ * @author Edward A. Lee
+ * @brief Interface library for displaying and visualizing results of ML inference.
+ */
+
 target Python {
   files: util/utils.py
 }
-
 
 /**
  * @brief The `DetectionVisualizer` is responsible of visualizing the results of an object detection inference on a video frame.

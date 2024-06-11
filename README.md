@@ -33,3 +33,7 @@ For each specific task library, a machine learning model is provided in the [`mo
 ```Python
 cls = new AudioClassifier(model="/absolute/path/to/model.tflite");
 ```
+
+### Example Usage
+
+In the folder [`src/`](src/), you can find several example LF programs that demonstrate the usage of the library's reactors for each specific task.
