@@ -1,26 +1,21 @@
 target Python
 
+# TODO
 reactor NLClassifier {
-    // TODO
 }
 
-
+# TODO
 reactor BertNLClassifier {
-    // TODO
 }
 
-
+# TODO
 reactor BertQuestionAnswer {
-    // TODO
 }
 
-
+# TODO
 reactor TextSearcher {
-    // TODO
 }
 
-
+# TODO
 reactor TextEmbedder {
-    // TODO
 }
-

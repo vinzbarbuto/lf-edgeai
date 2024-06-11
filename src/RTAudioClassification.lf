@@ -1,0 +1,43 @@
+/**
+ * @file
+ * @author Vincenzo Barbuto
+ * @brief Examples of how to use the Audio Classification reactor.
+ */
+target Python
+
+import Microphone from "../lib/Input.lf"
+import AudioClassifier from "../lib/Audio.lf"
+
+/**
+ * @brief This reactor tests the audio classification functionality by connecting a Microphone, an
+ * AudioClassifier, and an Actuator reactor.
+ *
+ * The `Actuator` reactor receives the classification results and inference time from the
+ * `AudioClassifier` and prints them to the console.
+ *
+ * The `main` reactor creates instances of the `Microphone`, `AudioClassifier`, and `Actuator`
+ * reactors, and connects them together to form the test pipeline.
+ *
+ * @note Remember to set the `model` parameter to the absolute path of the audio classification
+ * model you want to use.
+ */
+reactor Actuator {
+  input results
+  input inference_time
+
+  reaction(results, inference_time) {=
+    res = results.value
+    print("-"*70)
+    for i, result in enumerate(res):
+        print(f"{i}) Head: {result['head']}, Index: {result['index']}, Label: {result['label']}, Confidence: {result['score']*100:.2f}%")
+    print(f"Time per inference: {inference_time.value} ms")
+  =}
+}
+
+main reactor {
+  mic = new Microphone()
+  cls = new AudioClassifier(model="/path/to/model.tflite")
+  actuator = new Actuator()
+  mic.audio_data -> cls.input_data
+  cls.results, cls.inference_time -> actuator.results, actuator.inference_time
+}

@@ -1,16 +1,14 @@
 /**
- * @file 
- * @brief File containing Library of Reactor Components for Audio tasks. This library provides a set of
- * reusable and optimized components for performing various audio tasks, such as audio
+ * @file
+ * @brief File containing Library of Reactor Components for Audio tasks. This library provides a set
+ * of reusable and optimized components for performing various audio tasks, such as audio
  * classification, with high performance and efficiency.
  *
  * @author Vincenzo Barbuto
  */
-
 target Python
 
 import MLReactor from "../lib/AbstractReactors.lf"
-
 
 /**
  *
@@ -38,9 +36,7 @@ import MLReactor from "../lib/AbstractReactors.lf"
 */
 
 reactor AudioClassifier extends MLReactor {
-
   preamble {=
-    
     from tflite_support.task import audio, core, processor
 
     def collect_results(self, classifications):

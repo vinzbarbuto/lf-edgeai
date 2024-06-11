@@ -3,3 +3,4 @@ build
 src-gen
 include
 .DS_Store
+.ruff_cache

@@ -1,16 +1,14 @@
 /**
- * @file 
- * @brief File containing Library of Reactor Components for Computer Vision tasks. This library provides a
- * set of reusable components for performing various computer vision tasks, such as image
+ * @file
+ * @brief File containing Library of Reactor Components for Computer Vision tasks. This library
+ * provides a set of reusable components for performing various computer vision tasks, such as image
  * classification, object detection, and image segmentation
  *
  * @author Vincenzo Barbuto
  */
-
 target Python
 
 import MLReactor from "../lib/AbstractReactors.lf"
-
 
 /**
  * @brief Reactor that extends `MLReactor` performing image classification using a TensorFlow Lite model.
@@ -36,55 +34,53 @@ import MLReactor from "../lib/AbstractReactors.lf"
  */
 
 reactor ImageClassifier extends MLReactor {
+  preamble {=
+    from tflite_support.task import vision, core, processor
 
-    preamble {=
-        
-        from tflite_support.task import vision, core, processor
-    
-        def collect_results(self, classifications):
-            results_list = []
-            for classification in classifications:
-                results_list.append({
-                    "index": classification.categories[0].index,
-                    "label": classification.categories[0].category_name,
-                    "score": classification.categories[0].score,
-                    "head": classification.head_name
-                })
-            return results_list;
-      =}
+    def collect_results(self, classifications):
+        results_list = []
+        for classification in classifications:
+            results_list.append({
+                "index": classification.categories[0].index,
+                "label": classification.categories[0].category_name,
+                "score": classification.categories[0].score,
+                "head": classification.head_name
+            })
+        return results_list;
+  =}
 
-      reaction(startup) {=
-        if(self.model == ""):
-            print("Error: Please provide a valid model path")
-            request_stop()
-        else:
-            classification_options = self.processor.ClassificationOptions(
-                max_results=self.max_results, score_threshold=self.score_threshold)
-            options = self.vision.ImageClassifierOptions(base_options=self.base_options, classification_options=classification_options)
-            self.executor = self.vision.ImageClassifier.create_from_options(options)
-      =}
+  reaction(startup) {=
+    if(self.model == ""):
+        print("Error: Please provide a valid model path")
+        request_stop()
+    else:
+        classification_options = self.processor.ClassificationOptions(
+            max_results=self.max_results, score_threshold=self.score_threshold)
+        options = self.vision.ImageClassifierOptions(base_options=self.base_options, classification_options=classification_options)
+        self.executor = self.vision.ImageClassifier.create_from_options(options)
+  =}
 
-      reaction(input_data) -> results, inference_time {=
-        if(input_data.is_present):
-            # Classify the input image and get the result.
-            self.tensor_input = self.vision.TensorImage.create_from_array(input_data.value)
-            start = lf.time.physical()
-            result = self.executor.classify(self.tensor_input)
-            end = (lf.time.physical() - start) / 1000000
-            results.set(self.collect_results(result.classifications))
-            inference_time.set(end)
-        else:
-            print("Error: Input data is not present")
-            request_stop()
-      =}
+  reaction(input_data) -> results, inference_time {=
+    if(input_data.is_present):
+        # Classify the input image and get the result.
+        self.tensor_input = self.vision.TensorImage.create_from_array(input_data.value)
+        start = lf.time.physical()
+        result = self.executor.classify(self.tensor_input)
+        end = (lf.time.physical() - start) / 1000000
+        results.set(self.collect_results(result.classifications))
+        inference_time.set(end)
+    else:
+        print("Error: Input data is not present")
+        request_stop()
+  =}
 
-      reaction(shutdown) {=
-        print("Shutting down ImageClassifier reactor")
-      =}
+  reaction(shutdown) {=
+    print("Shutting down ImageClassifier reactor")
+  =}
 }
 
 /**
- * Reactor that extends `MLReactor` performing image segmentation using a TensorFlow Lite model.
+ * @brief Reactor that extends `MLReactor` performing image segmentation using a TensorFlow Lite model.
  *
  * Args:
  *    model (str): Absolute path to the TensorFlow Lite model file.
@@ -103,51 +99,47 @@ reactor ImageClassifier extends MLReactor {
  */
 
 reactor ImageSegmenter extends MLReactor {
-    
-    preamble {=
-        
-        from tflite_support.task import vision, core, processor
-    
-        def collect_results(self, segmentations):
-            results_list = []
-            for segment in segmentations:
-                results_list.append({
-                    "segment": segment
-                })
-            return results_list;
-    =}
+  preamble {=
+    from tflite_support.task import vision, core, processor
 
-    reaction(startup) {=
-        if(self.model == ""):
-            print("Error: Please provide a valid model path")
-            request_stop()
-        else:
-            segmentation_options = self.processor.SegmentationOptions(
-                output_type=self.processor.SegmentationOptions.output_type.CATEGORY_MASK)
-            options = self.vision.ImageSegmenterOptions(
-                base_options=self.base_options, segmentation_options=segmentation_options)
-            self.executor = self.vision.ImageSegmenter.create_from_options(options)
-    =}
+    def collect_results(self, segmentations):
+        results_list = []
+        for segment in segmentations:
+            results_list.append({
+                "segment": segment
+            })
+        return results_list;
+  =}
 
-    reaction(input_data) -> results, inference_time {=
-        if(input_data.is_present):
-            # Classify the input image and get the result.
-            self.tensor_input = self.vision.TensorImage.create_from_array(input_data.value)
-            start = lf.time.physical()
-            result = self.executor.segment(self.tensor_input)
-            end = (lf.time.physical() - start) / 1000000
-            results.set(self.collect_results(result.segmentations))
-            inference_time.set(end)
-        else:
-            print("Error: Input data is not present")
-            request_stop()
-    =}
-    
+  reaction(startup) {=
+    if(self.model == ""):
+        print("Error: Please provide a valid model path")
+        request_stop()
+    else:
+        segmentation_options = self.processor.SegmentationOptions(
+            output_type=self.processor.SegmentationOptions.output_type.CATEGORY_MASK)
+        options = self.vision.ImageSegmenterOptions(
+            base_options=self.base_options, segmentation_options=segmentation_options)
+        self.executor = self.vision.ImageSegmenter.create_from_options(options)
+  =}
 
+  reaction(input_data) -> results, inference_time {=
+    if(input_data.is_present):
+        # Classify the input image and get the result.
+        self.tensor_input = self.vision.TensorImage.create_from_array(input_data.value)
+        start = lf.time.physical()
+        result = self.executor.segment(self.tensor_input)
+        end = (lf.time.physical() - start) / 1000000
+        results.set(self.collect_results(result.segmentations))
+        inference_time.set(end)
+    else:
+        print("Error: Input data is not present")
+        request_stop()
+  =}
 }
 
 /**
- * Reactor that extends `MLReactor` performing object detection using a TensorFlow Lite model.
+ * @brief Reactor that extends `MLReactor` performing object detection using a TensorFlow Lite model.
  *
  * Args:
  *    model (str): Absolute path to the TensorFlow Lite model file.
@@ -170,58 +162,55 @@ reactor ImageSegmenter extends MLReactor {
  */
 
 reactor ObjectDetector extends MLReactor {
+  preamble {=
+    from tflite_support.task import vision, core, processor
 
-    preamble {=
-        
-        from tflite_support.task import vision, core, processor
-    
-        def collect_results(self, detections):
-            results_list = []
-            for detection in detections:
-                results_list.append({
-                    "index": detection.categories[0].index,
-                    "label": detection.categories[0].category_name,
-                    "box": detection.bounding_box,
-                    "score": detection.categories[0].score
-                })
-            return results_list;
-      =}
+    def collect_results(self, detections):
+        results_list = []
+        for detection in detections:
+            results_list.append({
+                "index": detection.categories[0].index,
+                "label": detection.categories[0].category_name,
+                "box": detection.bounding_box,
+                "score": detection.categories[0].score
+            })
+        return results_list;
+  =}
 
-    reaction(startup) {=
-        if(self.model == ""):
-            print("Error: Please provide a valid model path")
-            request_stop()
-        else:
-            detection_options = self.processor.DetectionOptions(
-                max_results=self.max_results, score_threshold=self.score_threshold)
-            options = self.vision.ObjectDetectorOptions(base_options=self.base_options, detection_options=detection_options)
-            self.executor = self.vision.ObjectDetector.create_from_options(options)
-    =}
+  reaction(startup) {=
+    if(self.model == ""):
+        print("Error: Please provide a valid model path")
+        request_stop()
+    else:
+        detection_options = self.processor.DetectionOptions(
+            max_results=self.max_results, score_threshold=self.score_threshold)
+        options = self.vision.ObjectDetectorOptions(base_options=self.base_options, detection_options=detection_options)
+        self.executor = self.vision.ObjectDetector.create_from_options(options)
+  =}
 
-    reaction(input_data) -> results, inference_time {=
-        if(input_data.is_present):
-            # Detect objects in the input image and get the result.
-            self.tensor_input = self.vision.TensorImage.create_from_array(input_data.value)
-            start = lf.time.physical()
-            result = self.executor.detect(self.tensor_input)
-            end = (lf.time.physical() - start) / 1000000
-            results.set(self.collect_results(result.detections))
-            inference_time.set(end)
-        else:
-            print("Error: Input data is not present")
-            request_stop()
-    =}
+  reaction(input_data) -> results, inference_time {=
+    if(input_data.is_present):
+        # Detect objects in the input image and get the result.
+        self.tensor_input = self.vision.TensorImage.create_from_array(input_data.value)
+        start = lf.time.physical()
+        result = self.executor.detect(self.tensor_input)
+        end = (lf.time.physical() - start) / 1000000
+        results.set(self.collect_results(result.detections))
+        inference_time.set(end)
+    else:
+        print("Error: Input data is not present")
+        request_stop()
+  =}
 
-    reaction(shutdown) {=
-        print("Shutting down ObjectDetector reactor")
-    =}
-    
-} 
-
-reactor ImageSearcher {
-    // TODO (?)
+  reaction(shutdown) {=
+    print("Shutting down ObjectDetector reactor")
+  =}
 }
 
+# TODO (?)
+reactor ImageSearcher {
+}
+
+# TODO (?)
 reactor ImageEmbedder {
-    // TODO (?)
 }

@@ -1,0 +1,32 @@
+target Python {
+  keepalive: true,
+  single-threaded: true  # OpenCV crashes if we use the multithreaded version.
+}
+
+import Camera from "../lib/Input.lf"
+import DetectionVisualizer from "../lib/Output.lf"
+import ObjectDetector from "../lib/ComputerVision.lf"
+
+/**
+ * @brief This reactor tests the object detection functionality by connecting a Camera, an
+ * ObjectDetectior, and a DetectionVisualizer reactor.
+ *
+ * The `DetectionVisualizer` reactor receives the detections results and inference time from the
+ * `ObjectDetector`, shows detectios results in a video window and prints the inference time to the console.
+ *
+ * The `main` reactor creates instances of the `Camera`, `ObjectDetector`, and `DetectionVisualizer`
+ * reactors, and connects them together to form the test pipeline.
+ *
+ * @note Remember to set the `model` parameter to the absolute path of the object detection
+ * model you want to use.
+ */
+main reactor {
+  camera = new Camera()
+  display = new DetectionVisualizer()
+  obj = new ObjectDetector(model="/path/to/model.tflite")
+  camera.camera_frame -> display.original_frame
+  camera.camera_frame ~> camera.trigger
+  camera.camera_frame -> obj.input_data
+  obj.inference_time -> display.inference_time
+  obj.results -> display.results
+}

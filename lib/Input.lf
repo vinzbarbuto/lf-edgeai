@@ -4,7 +4,6 @@
  * @author Edward A. Lee
  * @brief Interface library for input devices such as microphones, cameras, and other sensors.
  */
-
 target Python
 
 /**
@@ -16,56 +15,115 @@ target Python
  * the `audio_data` output.
  * 
  * Args:
- *     buffer_size (int): The size of the audio buffer in samples.
- *     sample_rate (int): The sample rate of the audio in Hz.
- *     channels (int): The number of audio channels.
- *     device (Optional[int]): The audio device to use for recording, or `None` to use the default device.
+ *  buffer_size (int): The size of the audio buffer in samples.
+ *  sample_rate (int): The sample rate of the audio in Hz.
+ *  channels (int): The number of audio channels.
+ *  device (Optional[int]): The audio device to use for recording, or `None` to use the default device.
  * 
  * Reactions:
- *     startup: Starts the audio input stream and begins recording audio.
- *     send_audio_data: Emits the recorded audio data through the `audio_data` output.
- *     shutdown: Stops the audio input stream and shuts down the reactor.
+ *  startup: Starts the audio input stream and begins recording audio.
+ *  send_audio_data: Emits the recorded audio data through the `audio_data` output.
+ *  shutdown: Stops the audio input stream and shuts down the reactor.
 */
-
 reactor Microphone(buffer_size=15600, sample_rate=16000, channels=1, device = {= None =}) {
-    physical action send_audio_data
-    output audio_data
-  
-    state stream
-  
-    preamble {=
-      import sounddevice as sd
-      import numpy as np
-    =}
-  
-    reaction(startup) -> send_audio_data {=
+  physical action send_audio_data
+  output audio_data
 
-      def callback(indata, frames, time, status):
-        if status:
-          print(status)
-        input_data = indata.astype(self.np.float32)
-        send_audio_data.schedule(0, input_data)
+  state stream
 
-      self.stream = self.sd.InputStream(
-        channels=self.channels, 
-        samplerate=self.sample_rate, 
-        blocksize=self.buffer_size,
-        callback=callback,
-        device=self.device)
-      self.stream.start()
-      print("#" * 50)
-      print("Recording started")
-      print("#" * 50)
+  preamble {=
+    import sounddevice as sd
+    import numpy as np
+  =}
 
-    =}
-  
-    reaction(send_audio_data) -> audio_data {=
-      audio_data.set(send_audio_data.value)
-    =}
-  
-    reaction(shutdown) {=
-      if self.stream:
-        self.stream.stop()
-      print("Shutting down Microphone reactor")
-    =}
-  }
+  reaction(startup) -> send_audio_data {=
+    def callback(indata, frames, time, status):
+      if status:
+        print(status)
+      input_data = indata.astype(self.np.float32)
+      send_audio_data.schedule(0, input_data)
+
+    self.stream = self.sd.InputStream(
+      channels=self.channels,
+      samplerate=self.sample_rate,
+      blocksize=self.buffer_size,
+      callback=callback,
+      device=self.device)
+    self.stream.start()
+    print("#" * 50)
+    print("Recording started")
+    print("#" * 50)
+  =}
+
+  reaction(send_audio_data) -> audio_data {=
+    audio_data.set(send_audio_data.value)
+  =}
+
+  reaction(shutdown) {=
+    if self.stream:
+      self.stream.stop()
+    print("Shutting down Microphone reactor")
+  =}
+}
+
+/**
+ * @brief The `Camera` reactor is responsible for capturing real-time video data from 
+ * a camera device and emitting it as an output.
+ *
+ * Args: 
+ *  camera_id (int): The ID of the camera to use for capturing video. 
+ *  offset (float): The initial offset in seconds for the start timer. 
+ *  fps (int): The desired frames per second for the video capture.
+ *
+ * Reactions: 
+ *  start: Initializes the camera stream and captures the first frame. 
+ *  trigger: Captures a new video frame and emits it through the `camera_frame` output. 
+ *  shutdown: Releases the camera stream.
+ *
+ * Inputs: 
+ *  trigger: Triggers the capture of a new video frame.
+ *
+ * Outputs: 
+ *  camera_frame: The captured video frame.
+ */
+reactor Camera(camera_id=0, offset = 0 s, fps=30) {
+  input trigger
+  output camera_frame
+
+  timer start(offset)
+  state stream
+
+  preamble {=
+    import cv2
+    import sys
+  =}
+
+  reaction(start) -> camera_frame {=
+    self.stream = self.cv2.VideoCapture(self.camera_id, self.cv2.CAP_ANY)
+    if (self.stream.isOpened() == False):
+      self.sys.stderr.write("Error: Failed to open the camera.\n")
+      exit(1)
+
+    self.stream.set(self.cv2.CAP_PROP_FPS, self.fps)
+
+    # Read the first frame. This is a blocking read.
+    ret, frame = self.stream.read()
+    if ret is True:
+      camera_frame.set(frame)
+    else:
+      print("Warning, failed to get first frame.")
+  =}
+
+  reaction(trigger) -> camera_frame {=
+    # Read a frame. This is a blocking read.
+    ret, frame = self.stream.read()
+    if ret is True:
+      camera_frame.set(frame)
+    else:
+      print("Warning, failed to get first frame.")
+  =}
+
+  reaction(shutdown) {=
+    self.stream.release()
+  =}
+}

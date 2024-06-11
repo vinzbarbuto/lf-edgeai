@@ -1,12 +1,11 @@
 /**
  * @file MLReactor.lf
  * @author Vincenzo Barbuto
-*/
-
+ */
 target Python
 
 /**
- * The `MLReactor` reactor is the parent reactor for all other AI algorithms. It provides a unified
+ * @brief The `MLReactor` reactor is the parent reactor for all other AI algorithms. It provides a unified
  * interface for executing machine learning models and processing their outputs.
  * 
  * Args:
@@ -30,22 +29,21 @@ reactor MLReactor(
     score_threshold=0.0,
     num_threads=4,
     enable_edgetpu=False) {
+  
+  state executor
+  state tensor_input
+  state base_options
 
-    state executor;
-    state tensor_input;
-    state base_options;
-    
-    input input_data;
-    
-    output results;
-    output inference_time;
+  input input_data
 
-    preamble {=
-        from tflite_support.task import core
-    =}
+  output results
+  output inference_time
 
-    reaction(startup) {=
-        self.base_options = self.core.BaseOptions(file_name=self.model, use_coral=self.enable_edgetpu, num_threads=self.num_threads)
-    =}
+  preamble {=
+    from tflite_support.task import core
+  =}
 
+  reaction(startup) {=
+    self.base_options = self.core.BaseOptions(file_name=self.model, use_coral=self.enable_edgetpu, num_threads=self.num_threads)
+  =}
 }
