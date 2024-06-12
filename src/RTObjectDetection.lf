@@ -1,10 +1,15 @@
+/**
+ * @file
+ * @author Vincenzo Barbuto
+ * @brief Examples of how to perform real-time object detection using a TensorFlow Lite model.
+ */
 target Python {
   keepalive: true,
   single-threaded: true  # OpenCV crashes if we use the multithreaded version.
 }
 
 import Camera from "../lib/Input.lf"
-import DetectionVisualizer from "../lib/Output.lf"
+import DetectionVisualizer from "../lib/Display.lf"
 import ObjectDetector from "../lib/ComputerVision.lf"
 
 /**

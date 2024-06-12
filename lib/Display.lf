@@ -1,0 +1,94 @@
+/**
+ * @file
+ * @author Vincenzo Barbuto
+ * @author Edward A. Lee
+ * @brief Interface library for displaying and visualizing results of ML inference.
+ */
+target Python {
+  files: util/utils.py
+}
+
+/**
+ * @brief The `DetectionVisualizer` is responsible of visualizing the results of an object detection
+ * inference on a video frame.
+ *
+ * This reactor takes in the original video frame, the inference results, and the inference time,
+ * and displays the video frame with the detected objects' bounding boxes drawn on it. It also
+ * prints the inference time to the console. The user can press 'q' to exit the video window.
+ */
+reactor DetectionVisualizer {
+  input original_frame
+  input inference_time
+  input results
+
+  preamble {=
+    import cv2
+    from utils import DetectionUtils as du
+  =}
+
+  reaction(startup) {=
+    print("\n******* Press 'q' in the video window to exit *******\n")
+  =}
+
+  reaction(original_frame, results, inference_time) {=
+    # Get the frame from the input
+    frame = original_frame.value
+    self.du.draw_bounding_boxes(frame, results.value)
+    self.cv2.imshow("frame", frame)
+    print("Inference time: ", inference_time.value)
+    # press 'Q' if you want to exit
+    if self.cv2.waitKey(10) & 0xFF == ord('q'):
+      request_stop()
+  =}
+
+  reaction(shutdown) {=
+    # Destroy the all windows now
+    self.cv2.destroyAllWindows()
+  =}
+}
+
+/**
+ * @brief The `SegmentationVisualizer` is responsible for visualizing the results of a semantic
+ * segmentation inference on a video frame.
+ *
+ * This reactor takes in the original video frame, the inference results, and the inference time,
+ * and displays the video frame with the segmented regions overlaid on it. It also prints the
+ * inference time to the console. The user can press 'q' to exit the video window.
+ */
+reactor SegmentationVisualizer {
+  input original_frame
+  input inference_time
+  input results
+
+  preamble {=
+    import cv2
+    from utils import SegmentationUtils as su
+  =}
+
+  reaction(startup) {=
+    print("\n******* Press 'q' in the video window to exit *******\n")
+  =}
+
+  reaction(original_frame, results, inference_time) {=
+    # Get the frame from the input
+    frame = original_frame.value
+    res = results.value
+    for result in res:
+      seg_map_img, found_colored_labels = self.su.segmentation_map_to_image(result["segment"])
+      seg_map_img = self.cv2.resize(
+            seg_map_img,
+            dsize=(frame.shape[1], frame.shape[0]),
+            interpolation=self.cv2.INTER_NEAREST)
+      overlay = self.su.visualize(frame,seg_map_img,"overlay",0,found_colored_labels)
+      print("Inference time: ", inference_time.value)
+      self.cv2.imshow("frame", overlay)
+    # press 'Q' if you want to exit
+    if self.cv2.waitKey(10) & 0xFF == ord('q'):
+      request_stop()
+  =}
+
+  reaction(shutdown) {=
+    # Destroy the all windows now
+    self.cv2.destroyAllWindows()
+  =}
+}

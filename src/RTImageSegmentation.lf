@@ -1,0 +1,37 @@
+/**
+ * @file
+ * @author Vincenzo Barbuto
+ * @brief Examples of how to perform real-time image segmentation using a TensorFlow Lite model.
+ */
+target Python {
+  keepalive: true,
+  single-threaded: true  # OpenCV crashes if we use the multithreaded version.
+}
+
+import Camera from "../lib/Input.lf"
+import SegmentationVisualizer from "../lib/Display.lf"
+import ImageSegmenter from "../lib/ComputerVision.lf"
+
+/**
+ * @brief This reactor tests the real-time image segmentation functionality by connecting a Camera, an
+ * ImageSegmenter, and a SegmentationVisualizer reactor.
+ *
+ * The `SegmentationVisualizer` reactor receives the segmentations results and inference time from the
+ * `ImageSegmenter`, shows results in a video window and prints the inference time to the console.
+ *
+ * The `main` reactor creates instances of the `Camera`, `ImageSegmenter`, and `SegmentationVisualizer`
+ * reactors, and connects them together to form the test pipeline.
+ *
+ * @note Remember to set the `model` parameter to the absolute path of the image segmentation
+ * model you want to use.
+ */
+main reactor {
+  camera = new Camera()
+  display = new SegmentationVisualizer()
+  segmenter = new ImageSegmenter(model="/path/to/model.tflite")
+  camera.camera_frame -> segmenter.input_data
+  camera.camera_frame -> display.original_frame
+  camera.camera_frame ~> camera.trigger
+  segmenter.inference_time -> display.inference_time
+  segmenter.results -> display.results
+}
