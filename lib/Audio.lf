@@ -1,5 +1,5 @@
 /**
- * @file
+ * @file Audio.lf
  * @brief File containing Library of Reactor Components for Audio tasks. This library provides a set
  * of reusable and optimized components for performing various audio tasks, such as audio
  * classification, with high performance and efficiency.

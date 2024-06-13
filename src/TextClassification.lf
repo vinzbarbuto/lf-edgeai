@@ -1,0 +1,59 @@
+/**
+ * @file BertQA.lf
+ * @author Vincenzo Barbuto
+ * @brief Examples of how to use the NLP library to perform text classification.
+ */
+target Python
+
+import NLClassifier from "../lib/NLP.lf"
+
+/**
+ * The `Injector` reactor is responsible for getting text input from the user and passing it to the
+ * `NLClassifier` reactor.
+ *
+ * The `get_text()` method prompts the user to enter text to be classified, and the
+ * `reaction(startup)` method sets the `text` output to the user's input.
+ *
+ * The `ResultPrinter` reactor is responsible for printing the classification results and the
+ * inference time. The `reaction(results, inference_time)` method iterates through the
+ * classification results and prints the name and score of each result, as well as the inference
+ * time.
+ *
+ * The `main` reactor creates instances of the `NLClassifier`, `Injector`, and `ResultPrinter`
+ * reactors, and connects them together to form the text classification pipeline.
+ */
+reactor Injector {
+  output text
+
+  preamble {=
+    def get_text(self):
+        text = input("Enter text to classify: ")
+        return text
+  =}
+
+  reaction(startup) -> text {=
+    print("Starting TextInput reactor")
+    text.set(self.get_text())
+  =}
+}
+
+reactor ResultPrinter {
+  input results
+  input inference_time
+
+  reaction(results, inference_time) {=
+    for result in results.value:
+        print(f"Result: {result['name']}, Score: {result['score']}")
+    print(f"Inference time: {inference_time.value} ms")
+  =}
+}
+
+main reactor {
+  classifier = new NLClassifier(
+      model="/path/to/model.tflite")
+  injector = new Injector()
+  printer = new ResultPrinter()
+  injector.text -> classifier.input_data
+  classifier.results -> printer.results
+  classifier.inference_time -> printer.inference_time
+}

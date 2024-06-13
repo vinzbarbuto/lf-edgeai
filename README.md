@@ -14,18 +14,18 @@ The objective is to develop several LF programs incorporating multiple reactors,
 
 The AI algorithms to be included in the library are as follows:
 
-- **[`Audio.lf`](src/Audio.lf)**
+- **[`Audio.lf`](lib/Audio.lf)**
     - [x] `AudioClassifier`
-- **[`ComputerVision.lf`](src/ComputerVision.lf)**
+- **[`ComputerVision.lf`](lib/ComputerVision.lf)**
     - [x] `ImageClassifier`
     - [x] `ImageSegmenter`
     - [x] `ObjectDetector`
     <!-- - [ ] `ImageSearcher` (?)
     - [ ] `ImageEmbedder` (?) -->
-- **[`NLP.lf`](src/NLP.lf)**
-    - [ ] `NLClassifier`
+- **[`NLP.lf`](lib/NLP.lf)**
+    - [x] `NLClassifier`
     - [ ] `BertNLClassifier`
-    - [ ] `BertQuestionAnswer`
+    - [x] `BertQuestionAnswer`
     <!-- - [ ] `TextSearcher`
     - [ ] `TextEmbedder` -->
 
@@ -37,3 +37,15 @@ cls = new AudioClassifier(model="/absolute/path/to/model.tflite");
 ### Example Usage
 
 In the folder [`src/`](src/), you can find several example LF programs that demonstrate the usage of the library's reactors for each specific task.
+
+- **`Audio Classification`**
+    - [`Real-Time Audio Classification`](src/RTAudioClassification.lf)
+- **`Computer Vision`**
+    - [`Image Classification`](src/SimpleImageClassification.lf)
+    - [`Image Segmentation`](src/SimpleImageSegmentation.lf)
+    - [`Real-Time Image Segmentation`](src/RTImageSegmentation.lf)
+    - [`Object Detection`](src/SimpleObjectDetection.lf)
+    - [`Real-Time Object Detection`](src/RTObjectDetection.lf)
+- **`Natural Language Processing`**
+    - [`Text Classification`](src/TextClassification.lf)
+    - [`Question & Answer`](src/BertQA.lf)

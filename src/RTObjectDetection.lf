@@ -1,5 +1,5 @@
 /**
- * @file
+ * @file RTObjectDetection.lf
  * @author Vincenzo Barbuto
  * @brief Examples of how to perform real-time object detection using a TensorFlow Lite model.
  */

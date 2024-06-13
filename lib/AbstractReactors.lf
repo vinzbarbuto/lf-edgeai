@@ -1,5 +1,5 @@
 /**
- * @file MLReactor.lf
+ * @file AbstractReactors.lf
  * @author Vincenzo Barbuto
  */
 target Python
@@ -46,4 +46,27 @@ reactor MLReactor(
   reaction(startup) {=
     self.base_options = self.core.BaseOptions(file_name=self.model, use_coral=self.enable_edgetpu, num_threads=self.num_threads)
   =}
+}
+
+/**
+ * @brief The `NLPReactor` reactor is a parent reactor for natural language processing (NLP)
+ * algorithms. It provides a unified interface for executing NLP models and processing their
+ * outputs.
+ *
+ * Args: 
+ *     model (str): The path to the NLP model.
+ *
+ * Inputs: 
+ *     input_data (Any): The input data to be processed by the NLP model (e.g. text).
+ *
+ * Outputs: 
+ *     results (list[dict]): A list containing the output results for each input.
+ *     inference_time (float): Time taken to perform the NLP processing, in milliseconds.
+ */
+reactor NLPReactor(model="") {
+  state executor
+
+  input input_data
+  output results
+  output inference_time
 }

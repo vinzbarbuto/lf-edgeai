@@ -1,5 +1,5 @@
 /**
- * @file
+ * @file ComputerVision.lf
  * @brief File containing Library of Reactor Components for Computer Vision tasks. This library
  * provides a set of reusable components for performing various computer vision tasks, such as image
  * classification, object detection, and image segmentation

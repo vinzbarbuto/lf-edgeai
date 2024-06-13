@@ -1,15 +1,140 @@
+/**
+ * @file NLP.lf
+ * @brief File containing Library of Reactor Components for Natural Language Processing (NLP) tasks. This library
+ * provides a set of reusable components for performing various NLP tasks, such as text classification, Q&A, and
+ * text search.
+ *
+ * @author Vincenzo Barbuto
+ */
 target Python
 
-# TODO
-reactor NLClassifier {
+import NLPReactor from "../lib/AbstractReactors.lf"
+
+/**
+ * @class NLClassifier
+ * @brief A reactor component for performing natural language classification tasks using a
+ * TensorFlow Lite model.
+ *
+ * This reactor takes an input text string, classifies it using a TensorFlow Lite model,
+ * and returns the classification results along with the inference time.
+ *
+ * The reactor requires a valid path to the TensorFlow Lite model file to be provided during
+ * initialization.
+ *
+ * Args:
+ *    model (str): Absolute path to the TensorFlow Lite model file.
+ * Inputs:
+ *    input_data (numpy.ndarray): Text data to be classified.
+ * Outputs:
+ *    results (list[dict]): The classification results, including the category name and score.
+ *    inference_time (float): Time taken to perform the classification, in milliseconds.
+ *
+ */
+reactor NLClassifier extends NLPReactor {
+  preamble {=
+    from tflite_support.task import text
+
+    def collect_results(self, result):
+        results_list = []
+        for classification in result.classifications[0].categories:
+            results_list.append({
+                "name": classification.category_name,
+                "score": classification.score
+            })
+        return results_list
+  =}
+
+  reaction(startup) {=
+    if(self.model == ""):
+        print("Error: Please provide a valid model path")
+        request_stop()
+    else:
+        self.executor = self.text.NLClassifier.create_from_file(self.model)
+  =}
+
+  reaction(input_data) -> results, inference_time {=
+    if(input_data.is_present):
+        start = lf.time.physical()
+        result = self.executor.classify(input_data.value)
+        end = (lf.time.physical() - start) / 1000000
+        results.set(self.collect_results(result))
+        inference_time.set(end)
+    else:
+        print("Error: Input data is not present")
+        request_stop()
+  =}
+
+  reaction(shutdown) {=
+    print("Shutting down NLClassifier reactor")
+  =}
 }
 
 # TODO
 reactor BertNLClassifier {
 }
 
-# TODO
-reactor BertQuestionAnswer {
+/**
+ * A reactor that performs question-answering using a BERT-based model.
+ *
+ *
+ * This reactor loads a pre-trained BERT-based question-answering model from a file specified by the
+ * `model` parameter. It also loads a context file specified by the `context_file` parameter, which
+ * is used to provide the context for the question-answering task.
+ *
+ * When the `input_data` is received, the reactor uses the loaded model to answer the question based
+ * on the provided context, and returns the results and the inference time.
+ *
+ * Args:
+ *    model (str): Absolute path to the TensorFlow Lite model file.
+ *    context_file (str): Absolute path to the context file.
+ * Inputs: 
+ *    input_data (str): The question to be answered.
+ *
+ * Outputs: 
+ *    results (list[dict]): The answers to the question, each with an index and the answer text. 
+ *    inference_time (float): The time taken to perform the question-answering, in milliseconds.
+ */
+reactor BertQuestionAnswer(context_file="") extends NLPReactor {
+  state context
+
+  preamble {=
+    from tflite_support.task import text
+
+    def collect_results(self, result):
+      results_list = []
+      for i, answer in enumerate(result.answers):
+        results_list.append({
+          "index": i,
+          "answer": answer.text,
+        })
+      return results_list
+  =}
+
+  reaction(startup) {=
+    if(self.model == ""):
+      print("Error: Please provide a valid model path")
+      request_stop()
+    elif(self.context_file == ""):
+      print("Error: Please provide a valid context path")
+      request_stop()
+    else:
+      self.executor = self.text.BertQuestionAnswerer.create_from_file(self.model)
+      file = open(self.context_file, "r")
+      self.context = file.read()
+  =}
+
+  reaction(input_data) -> results, inference_time {=
+    if(input_data.is_present):
+      start = lf.time.physical()
+      result = self.executor.answer(self.context, input_data.value)
+      end = (lf.time.physical() - start) / 1000000
+      results.set(self.collect_results(result))
+      inference_time.set(end)
+  =}
+
+  reaction(shutdown) {=
+    print("Shutting down BertQuestionAnswer reactor")
+  =}
 }
 
 # TODO

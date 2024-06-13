@@ -1,5 +1,5 @@
 /**
- * @file
+ * @file Display.lf
  * @author Vincenzo Barbuto
  * @author Edward A. Lee
  * @brief Interface library for displaying and visualizing results of ML inference.
