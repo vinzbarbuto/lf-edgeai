@@ -1,12 +1,12 @@
 [package]
 name = "EdgeAI"
-version = "0.2.1"
+version = "0.3.0"
 
 [properties]
 
 [lib]
 name = "EdgeAI"
-main = "./src/Audio.lf"
+main = ""
 target = "Python"
 platform = "Native"
 
