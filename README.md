@@ -24,10 +24,11 @@ The AI algorithms to be included in the library are as follows:
     - [ ] `ImageEmbedder` (?) -->
 - **[`NLP.lf`](lib/NLP.lf)**
     - [x] `NLClassifier`
-    - [ ] `BertNLClassifier`
     - [x] `BertQuestionAnswer`
     <!-- - [ ] `TextSearcher`
     - [ ] `TextEmbedder` -->
+
+>  **Note**: The `NLClassifier` supports both **BERT-based** and **Average Word Embedding** (AWE) model architectures.
 
 For each specific task library, a machine learning model is provided in the [`models/`](models/) folder. However, you can train and use your own model with the single reactor. Just be sure to carefully read the [documentation](https://www.tensorflow.org/lite/inference_with_metadata/task_library/overview) for the specific library task API you intend to use to verify model compatibility. Regardless of the model you use, it is important to specify the model's absolute path when instantiating a reactor library in your main reactor. For example:
 ```Python
