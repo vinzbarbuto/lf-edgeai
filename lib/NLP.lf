@@ -24,7 +24,7 @@ import NLPReactor from "../lib/AbstractReactors.lf"
  *
  * Args:
  *    model (str): Absolute path to the TensorFlow Lite model file.
- *    BERT_based (bool): ndicates whether to use a BERT-based model architecture (default) or an average word embedding model architecture.
+ *    BERT_based (bool): Indicates whether to use a BERT-based model architecture (default) or an average word embedding model architecture.
  * Inputs:
  *    input_data (numpy.ndarray): Text data to be classified.
  * Outputs:
