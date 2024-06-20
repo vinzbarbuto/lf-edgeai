@@ -48,4 +48,5 @@ In the folder [`src/`](src/), you can find several example LF programs that demo
     - [`Real-Time Object Detection`](src/RTObjectDetection.lf)
 - **`Natural Language Processing`**
     - [`Text Classification`](src/TextClassification.lf)
+    - [`Real-Time Speech-to-Text Sentiment Analysis`](src/SentimentAnalysisSpeech.lf)
     - [`Question & Answer`](src/BertQA.lf)

@@ -21,8 +21,10 @@ import NLPReactor from "../lib/AbstractReactors.lf"
  * The reactor requires a valid path to the TensorFlow Lite model file to be provided during
  * initialization.
  *
+ *
  * Args:
  *    model (str): Absolute path to the TensorFlow Lite model file.
+ *    BERT_based (bool): ndicates whether to use a BERT-based model architecture (default) or an average word embedding model architecture.
  * Inputs:
  *    input_data (numpy.ndarray): Text data to be classified.
  * Outputs:
@@ -30,7 +32,7 @@ import NLPReactor from "../lib/AbstractReactors.lf"
  *    inference_time (float): Time taken to perform the classification, in milliseconds.
  *
  */
-reactor NLClassifier extends NLPReactor {
+reactor NLClassifier(BERT_based=True) extends NLPReactor {
   preamble {=
     from tflite_support.task import text
 
@@ -48,8 +50,10 @@ reactor NLClassifier extends NLPReactor {
     if(self.model == ""):
         print("Error: Please provide a valid model path")
         request_stop()
+    elif(self.BERT_based):
+        self.executor = self.text.BertNLClassifier.create_from_file(self.model)
     else:
-        self.executor = self.text.NLClassifier.create_from_file(self.model)
+      self.executor = self.text.NLClassifier.create_from_file(self.model)
   =}
 
   reaction(input_data) -> results, inference_time {=
@@ -67,10 +71,6 @@ reactor NLClassifier extends NLPReactor {
   reaction(shutdown) {=
     print("Shutting down NLClassifier reactor")
   =}
-}
-
-# TODO
-reactor BertNLClassifier {
 }
 
 /**

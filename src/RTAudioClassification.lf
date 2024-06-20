@@ -35,7 +35,7 @@ reactor Actuator {
 }
 
 main reactor {
-  mic = new Microphone()
+  mic = new Microphone(dtype="float32")
   cls = new AudioClassifier(model="/path/to/model.tflite")
   actuator = new Actuator()
   mic.audio_data -> cls.input_data

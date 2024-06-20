@@ -25,7 +25,7 @@ target Python
  *  send_audio_data: Emits the recorded audio data through the `audio_data` output.
  *  shutdown: Stops the audio input stream and shuts down the reactor.
 */
-reactor Microphone(buffer_size=15600, sample_rate=16000, channels=1, device = {= None =}) {
+reactor Microphone(buffer_size=15600, sample_rate=16000, channels=1, device = {= None =}, dtype = {= None =}) {
   physical action send_audio_data
   output audio_data
 
@@ -40,14 +40,16 @@ reactor Microphone(buffer_size=15600, sample_rate=16000, channels=1, device = {=
     def callback(indata, frames, time, status):
       if status:
         print(status)
-      input_data = indata.astype(self.np.float32)
-      send_audio_data.schedule(0, input_data)
+      if(self.dtype is not None):
+        indata = indata.astype(self.dtype)
+      send_audio_data.schedule(0, indata)
 
     self.stream = self.sd.InputStream(
       channels=self.channels,
       samplerate=self.sample_rate,
       blocksize=self.buffer_size,
       callback=callback,
+      dtype=self.dtype,
       device=self.device)
     self.stream.start()
     print("#" * 50)
