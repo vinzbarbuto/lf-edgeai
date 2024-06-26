@@ -34,8 +34,28 @@ For each specific task library, a machine learning model is provided in the [`mo
 ```Python
 cls = new AudioClassifier(model="/absolute/path/to/model.tflite");
 ```
+----
 
-### Example Usage
+## Efficiently Managing and Downloading Machine Learning Models with Git LFS
+
+Each model in the [`models/`](models/) folder is stored using [Git Large File Storage (LFS)](https://git-lfs.com/), a Git extension designed for handling large files. Git LFS replaces large files, such as machine learning models, with text pointers inside Git, while storing the actual file contents on a remote server like GitHub.com or GitHub Enterprise.
+
+To fully download and use the machine learning models in this repository, follow these steps:
+
+1. **Install Git LFS**: You need to install Git LFS on your local machine. Refer to the [Git LFS documentation](https://git-lfs.github.com/) for detailed installation instructions.
+
+2. **Clone the Repository**: Clone this repository to your local machine.
+
+3. **Fetch and Pull Models**: Navigate to the root folder of the project and execute the following commands to fetch and pull the large files:
+
+    ```bash
+    git lfs fetch
+    git lfs pull
+    ```
+
+By following these steps, you ensure that all large model files are properly downloaded and ready for use. For additional details, please refer to the [Git LFS documentation](https://git-lfs.github.com/).
+
+## Example Usage
 
 In the folder [`src/`](src/), you can find several example LF programs that demonstrate the usage of the library's reactors for each specific task.
 
