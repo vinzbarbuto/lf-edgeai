@@ -36,7 +36,8 @@ reactor Actuator {
 
 main reactor {
   mic = new Microphone(dtype="float32")
-  cls = new AudioClassifier(model="/path/to/model.tflite")
+  cls = new AudioClassifier(
+      model = {= os.path.join(os.getcwd(),"models/audio/yamnet/yamnet.tflite") =})
   actuator = new Actuator()
   mic.audio_data -> cls.input_data
   cls.results, cls.inference_time -> actuator.results, actuator.inference_time

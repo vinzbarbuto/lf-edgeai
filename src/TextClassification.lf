@@ -50,7 +50,7 @@ reactor ResultPrinter {
 
 main reactor {
   classifier = new NLClassifier(
-      model="/path/to/model.tflite")
+      model = {= os.path.join(os.getcwd(),"models/nlp/classification/bert_classifier.tflite") =})
   injector = new Injector()
   printer = new ResultPrinter()
   injector.text -> classifier.input_data

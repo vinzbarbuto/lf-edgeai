@@ -52,7 +52,7 @@ reactor ImageClassifier extends MLReactor {
   reaction(startup) {=
     if(self.model == ""):
         print("Error: Please provide a valid model path")
-        request_stop()
+        lf.request_stop()
     else:
         classification_options = self.processor.ClassificationOptions(
             max_results=self.max_results, score_threshold=self.score_threshold)
@@ -71,7 +71,7 @@ reactor ImageClassifier extends MLReactor {
         inference_time.set(end)
     else:
         print("Error: Input data is not present")
-        request_stop()
+        lf.request_stop()
   =}
 
   reaction(shutdown) {=
@@ -114,7 +114,7 @@ reactor ImageSegmenter extends MLReactor {
   reaction(startup) {=
     if(self.model == ""):
         print("Error: Please provide a valid model path")
-        request_stop()
+        lf.request_stop()
     else:
         segmentation_options = self.processor.SegmentationOptions(
             output_type=self.processor.SegmentationOptions.output_type.CATEGORY_MASK)
@@ -134,7 +134,7 @@ reactor ImageSegmenter extends MLReactor {
         inference_time.set(end)
     else:
         print("Error: Input data is not present")
-        request_stop()
+        lf.request_stop()
   =}
 }
 
@@ -180,7 +180,7 @@ reactor ObjectDetector extends MLReactor {
   reaction(startup) {=
     if(self.model == ""):
         print("Error: Please provide a valid model path")
-        request_stop()
+        lf.request_stop()
     else:
         detection_options = self.processor.DetectionOptions(
             max_results=self.max_results, score_threshold=self.score_threshold)
@@ -199,7 +199,7 @@ reactor ObjectDetector extends MLReactor {
         inference_time.set(end)
     else:
         print("Error: Input data is not present")
-        request_stop()
+        lf.request_stop()
   =}
 
   reaction(shutdown) {=

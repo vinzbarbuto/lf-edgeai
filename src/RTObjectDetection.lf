@@ -17,18 +17,20 @@ import ObjectDetector from "../lib/ComputerVision.lf"
  * ObjectDetectior, and a DetectionVisualizer reactor.
  *
  * The `DetectionVisualizer` reactor receives the detections results and inference time from the
- * `ObjectDetector`, shows detectios results in a video window and prints the inference time to the console.
+ * `ObjectDetector`, shows detectios results in a video window and prints the inference time to the
+ * console.
  *
  * The `main` reactor creates instances of the `Camera`, `ObjectDetector`, and `DetectionVisualizer`
  * reactors, and connects them together to form the test pipeline.
  *
- * @note Remember to set the `model` parameter to the absolute path of the object detection
- * model you want to use.
+ * @note Remember to set the `model` parameter to the absolute path of the object detection model
+ * you want to use.
  */
 main reactor {
   camera = new Camera()
   display = new DetectionVisualizer()
-  obj = new ObjectDetector(model="/path/to/model.tflite")
+  obj = new ObjectDetector(
+      model = {= os.path.join(os.getcwd(),"models/vision/detection/ssd_mobilenet_v1.tflite") =})
   camera.camera_frame -> display.original_frame
   camera.camera_frame ~> camera.trigger
   camera.camera_frame -> obj.input_data

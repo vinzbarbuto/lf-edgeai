@@ -54,7 +54,7 @@ reactor AudioClassifier extends MLReactor {
   reaction(startup) {=
     if(self.model == ""):
         print("Error: Please provide a valid model path")
-        request_stop()
+        lf.request_stop()
     else:
         classification_options = self.processor.ClassificationOptions(
             max_results=self.max_results, score_threshold=self.score_threshold)
@@ -77,7 +77,7 @@ reactor AudioClassifier extends MLReactor {
         inference_time.set(end)
     else:
         print("Error: Input data is not present")
-        request_stop()
+        lf.request_stop()
   =}
 
   reaction(shutdown) {=

@@ -17,8 +17,7 @@ import ObjectDetector from "../lib/ComputerVision.lf"
  *
  * The main reactor wires up the `ImageInjector`, `ObjectDetector`, and `Actuator` reactors
  * together. The ImageInjector reactor outputs the image data to the ObjectDetector reactor. The
- * ObjectDetector reactor outputs the detection results and inference time to the Actuator
- * reactor.
+ * ObjectDetector reactor outputs the detection results and inference time to the Actuator reactor.
  *
  * @note Remember to set the `model` parameter to the absolute path of the obect detection model you
  * want to use, as well as the `img_path` parameter to the absolute path of the image file you want
@@ -52,7 +51,8 @@ reactor Actuator {
 
 main reactor {
   inj = new ImageInjector(img_path="/path/to/image.png")
-  obj = new ObjectDetector(model="/path/to/model.tflite")
+  obj = new ObjectDetector(
+      model = {= os.path.join(os.getcwd(),"models/vision/detection/ssd_mobilenet_v1.tflite") =})
   actuator = new Actuator()
   inj.image_data -> obj.input_data
   obj.results, obj.inference_time -> actuator.res, actuator.inference_time

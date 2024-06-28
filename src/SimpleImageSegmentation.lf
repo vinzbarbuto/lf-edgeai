@@ -14,13 +14,12 @@ import ImageSegmenter from "../lib/ComputerVision.lf"
  * `image_data` port. This allows the image to be consumed by other reactors in the pipeline, such
  * as the ImageSegmenter.
  *
- * The Actuator reactor receives the segmentation results and inference time from the
- * ImageSegmenter and prints them to the console.
+ * The Actuator reactor receives the segmentation results and inference time from the ImageSegmenter
+ * and prints them to the console.
  *
  * The main reactor wires up the `ImageInjector`, `ImageSegmenter`, and `Actuator` reactors
  * together. The ImageInjector reactor outputs the image data to the ImageSegmenter reactor. The
- * ImageSegmenter reactor outputs the detected results and inference time to the Actuator
- * reactor.
+ * ImageSegmenter reactor outputs the detected results and inference time to the Actuator reactor.
  *
  * @note Remember to set the `model` parameter to the absolute path of the image segmentation model
  * you want to use, as well as the `img_path` parameter to the absolute path of the image file you
@@ -54,7 +53,8 @@ reactor Actuator {
 
 main reactor {
   inj = new ImageInjector(img_path="/path/to/image.png")
-  sgm = new ImageSegmenter(model="/path/to/model.tflite")
+  sgm = new ImageSegmenter(
+      model = {= os.path.join(os.getcwd(),"models/vision/segmentation/deeplab.tflite") =})
   actuator = new Actuator()
   inj.image_data -> sgm.input_data
   sgm.results, sgm.inference_time -> actuator.res, actuator.inference_time

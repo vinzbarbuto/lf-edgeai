@@ -18,14 +18,24 @@ target Python
  *  buffer_size (int): The size of the audio buffer in samples.
  *  sample_rate (int): The sample rate of the audio in Hz.
  *  channels (int): The number of audio channels.
+ *  execution_mode (int): The execution mode of the reactor. 0 for realtime, 1 for recoding. Defaults to 0 (realtime).
  *  device (Optional[int]): The audio device to use for recording, or `None` to use the default device.
+ *  dtype (Optional[str]): The data type of the audio data: 'float32', 'int32', 'int16', 'int8', 'uint8'. Defaults to `None`.
  * 
  * Reactions:
  *  startup: Starts the audio input stream and begins recording audio.
  *  send_audio_data: Emits the recorded audio data through the `audio_data` output.
  *  shutdown: Stops the audio input stream and shuts down the reactor.
 */
-reactor Microphone(buffer_size=15600, sample_rate=16000, channels=1, device = {= None =}, dtype = {= None =}) {
+reactor Microphone(
+    buffer_size=15600,
+    sample_rate=16000,
+    channels=1,
+    execution_mode=0,
+    device = {= None =},
+    dtype = {= None =}) {
+  logical action realtime_mode
+  logical action recoding_mode
   physical action send_audio_data
   output audio_data
 
@@ -36,7 +46,16 @@ reactor Microphone(buffer_size=15600, sample_rate=16000, channels=1, device = {=
     import numpy as np
   =}
 
-  reaction(startup) -> send_audio_data {=
+  reaction(startup) -> realtime_mode, recoding_mode {=
+    if(self.execution_mode == 0):
+      print("Starting Microphone in REALTIME mode")
+      realtime_mode.schedule(0)
+    elif(self.execution_mode == 1):
+      print("Starting Microphone in RECORDING mode")
+      recoding_mode.schedule(0)
+  =}
+
+  reaction(realtime_mode) -> send_audio_data {=
     def callback(indata, frames, time, status):
       if status:
         print(status)
@@ -55,6 +74,10 @@ reactor Microphone(buffer_size=15600, sample_rate=16000, channels=1, device = {=
     print("#" * 50)
     print("Recording started")
     print("#" * 50)
+  =}
+
+  reaction(recoding_mode) {=
+    # TODO: Implement recoding mode
   =}
 
   reaction(send_audio_data) -> audio_data {=

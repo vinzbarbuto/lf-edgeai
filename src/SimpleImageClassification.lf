@@ -24,7 +24,6 @@ import ImageClassifier from "../lib/ComputerVision.lf"
  * model you want to use, as well as the `img_path` parameter to the absolute path of the image file
  * you want to use.
  */
- 
 reactor ImageInjector(img_path="") {
   output image_data
 
@@ -53,7 +52,10 @@ reactor Actuator {
 
 main reactor {
   inj = new ImageInjector(img_path="/path/to/image.png")
-  cls = new ImageClassifier(model="/path/to/model.tflite")
+  cls = new ImageClassifier(
+      model = {=
+        os.path.join(os.getcwd(),"models/vision/classification/tf2_mobilenet_v3_edgetpu_1.0_224_ptq.tflite")
+      =})
   actuator = new Actuator()
   inj.image_data -> cls.input_data
   cls.results, cls.inference_time -> actuator.res, actuator.inference_time

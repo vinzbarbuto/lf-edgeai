@@ -1,7 +1,8 @@
 /**
  * @file SentimentAnalysisSpeech.lf
  * @author Vincenzo Barbuto
- * @brief Examples of how to use the NLP library to perform real time speech to text sentiment analysis.
+ * @brief Examples of how to use the NLP library to perform real time speech to text sentiment
+ * analysis.
  */
 target Python
 
@@ -10,9 +11,9 @@ import NLClassifier from "../lib/NLP.lf"
 
 /**
  * The `SpeechToText` reactor is responsible for performing real-time speech recognition using the
- * Vosk speech recognition model. It takes an `audio` input coming from `Microphone` reactor, processes 
- * the audio data, and outputs the recognized text to the `NLClassifier` reactor to perform text classification.
- *
+ * Vosk speech recognition model. It takes an `audio` input coming from `Microphone` reactor,
+ * processes the audio data, and outputs the recognized text to the `NLClassifier` reactor to
+ * perform text classification.
  *
  * The `ResultPrinter` reactor is responsible for printing the results of the sentiment analysis
  * performed by the `NLClassifier` reactor. It takes the `results` and `text` inputs, and prints the
@@ -26,18 +27,23 @@ reactor SpeechToText {
   input audio
   output text
 
-  # The Vosk speech recognition model path is in the models directory of the project.
-  state model_path = "/absolute/path/to/vosk-model-small-en-us-0.15"
   state model
   state rec
 
   preamble {=
     import vosk
     import json
+    import os
+  =}
+
+  # The Vosk speech recognition model path is in the models directory of the project.
+  state model_path = {=
+    self.os.path.join(self.os.getcwd(), "models", "vosk-model-small-en-us-0.15")
   =}
 
   reaction(startup) {=
     # Load the model
+    print(self.model_path)
     self.model = self.vosk.Model(self.model_path)
     # Create the recognizer
     self.rec = self.vosk.KaldiRecognizer(self.model, 16000)
@@ -70,7 +76,7 @@ main reactor {
   mic = new Microphone(buffer_size=8000, dtype="int16")
   stt = new SpeechToText()
   cls = new NLClassifier(
-      model="/path/to/model.tflite")
+      model = {= os.path.join(os.getcwd(),"models/nlp/classification/bert_classifier.tflite") =})
   printer = new ResultPrinter()
   mic.audio_data -> stt.audio
   stt.text -> cls.input_data

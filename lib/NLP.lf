@@ -49,7 +49,7 @@ reactor NLClassifier(BERT_based=True) extends NLPReactor {
   reaction(startup) {=
     if(self.model == ""):
         print("Error: Please provide a valid model path")
-        request_stop()
+        lf.request_stop()
     elif(self.BERT_based):
         self.executor = self.text.BertNLClassifier.create_from_file(self.model)
     else:
@@ -65,7 +65,7 @@ reactor NLClassifier(BERT_based=True) extends NLPReactor {
         inference_time.set(end)
     else:
         print("Error: Input data is not present")
-        request_stop()
+        lf.request_stop()
   =}
 
   reaction(shutdown) {=
@@ -113,10 +113,10 @@ reactor BertQuestionAnswer(context_file="") extends NLPReactor {
   reaction(startup) {=
     if(self.model == ""):
       print("Error: Please provide a valid model path")
-      request_stop()
+      lf.request_stop()
     elif(self.context_file == ""):
       print("Error: Please provide a valid context path")
-      request_stop()
+      lf.request_stop()
     else:
       self.executor = self.text.BertQuestionAnswerer.create_from_file(self.model)
       file = open(self.context_file, "r")

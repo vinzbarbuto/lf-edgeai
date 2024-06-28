@@ -8,19 +8,21 @@ target Python
 import BertQuestionAnswer from "../lib/NLP.lf"
 
 /**
- * Defines two reactors, `Injector` and `ResultPrinter`, that work together to perform question answering using a BERT-based model.
- * 
- * The `Injector` reactor is responsible for prompting the user to enter a question, and passing that question to the `BertQuestionAnswer` 
- * reactor. It has an input `trigger` and an output `text`.
- * 
- * The `ResultPrinter` reactor is responsible for printing the answer(s) returned by the `BertQuestionAnswer` reactor, as well as the 
- * inference time. It has inputs `results` and `inference_time`, and an output `trigger`.
- * 
- * The `main` reactor creates instances of the `Injector`, `ResultPrinter`, and `BertQuestionAnswer` reactors, and connects them together 
- * to form the complete question answering system.
-*/
+ * Defines two reactors, `Injector` and `ResultPrinter`, that work together to perform question
+ * answering using a BERT-based model.
+ *
+ * The `Injector` reactor is responsible for prompting the user to enter a question, and passing
+ * that question to the `BertQuestionAnswer` reactor. It has an input `trigger` and an output
+ * `text`.
+ *
+ * The `ResultPrinter` reactor is responsible for printing the answer(s) returned by the
+ * `BertQuestionAnswer` reactor, as well as the inference time. It has inputs `results` and
+ * `inference_time`, and an output `trigger`.
+ *
+ * The `main` reactor creates instances of the `Injector`, `ResultPrinter`, and `BertQuestionAnswer`
+ * reactors, and connects them together to form the complete question answering system.
+ */
 reactor Injector {
-
   input trigger
   output text
 
@@ -41,13 +43,12 @@ reactor Injector {
   reaction(trigger) -> text {=
     text.set(self.get_text())
   =}
-
 }
 
 reactor ResultPrinter {
   input results
   input inference_time
-  output trigger 
+  output trigger
 
   reaction(results, inference_time) -> trigger {=
     for result in results.value:
@@ -59,12 +60,12 @@ reactor ResultPrinter {
 
 main reactor {
   answerer = new BertQuestionAnswer(
-      model="/path/to/model.tflite",
-      context_file = "/path/to/document.txt")
+      model = {= os.path.join(os.getcwd(),"models/nlp/qa/albert.tflite") =},
+      context_file = {= os.path.join(os.getcwd(),"util", "lf_docs.txt") =})
   injector = new Injector()
   printer = new ResultPrinter()
   injector.text -> answerer.input_data
   answerer.results -> printer.results
   answerer.inference_time -> printer.inference_time
-  printer.trigger ~> injector.trigger after 2ms
+  printer.trigger ~> injector.trigger after 2 ms
 }
