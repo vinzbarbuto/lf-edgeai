@@ -36,6 +36,36 @@ cls = new AudioClassifier(model="/absolute/path/to/model.tflite");
 ```
 ----
 
+## Dependencies
+
+In order to correctly use the library, you need to install several dependencies for executing machine learning models, capturing audio and video frames, etc. The following sections describe the dependencies and how to install them.
+
+### Machine Learning Library
+The implemented machine learning models make use of the [TensorFlow Lite](https://www.tensorflow.org/lite) library. To use the TensorFlow Lite library, you need to install it on your machine. Specifically, the toolkit used to help develop and deploy TFLite models is `tflite-support`. In order to install the toolkit, you can use the following command:
+```shell
+pip install tflite-support
+```
+
+Refer to the [TensorFlow Lite documentation](https://www.tensorflow.org/lite/guide) for further installation instructions.
+
+### Audio Capturing
+To record, capture, and playback audio, the library `sounddevice` has been used. It can be installed by executing the following command:
+```shell
+pip install sounddevice
+```
+This library relys on [`PortAudio`](http://www.portaudio.com/). Hence, to correctly use the library, you need to install PortAudio on your machine. For Mac and Windows users, PortAudio is installed automatically when installing the `tflite-support` pip package. However, if you are using Linux, you need to install PortAudio manually by executing the following command:
+```shell
+sudo apt-get update && apt-get install libportaudio2
+```
+Refer to the `sounddevice` [documentation](https://python-sounddevice.readthedocs.io/en/0.4.6/installation.html) for further installation instructions.
+
+### Video Capturing
+To capture video frames, the library `opencv-python` has been used. It can be installed by executing the following command:
+```shell
+pip install opencv-python
+```
+Refer to the `opencv-python` [documentation](https://pypi.org/project/opencv-python/) for further installation instructions.
+
 ## Efficiently Managing and Downloading Machine Learning Models with Git LFS
 
 Each model in the [`models/`](models/) folder is stored using [Git Large File Storage (LFS)](https://git-lfs.com/), a Git extension designed for handling large files. Git LFS replaces large files, such as machine learning models, with text pointers inside Git, while storing the actual file contents on a remote server like GitHub.com or GitHub Enterprise.

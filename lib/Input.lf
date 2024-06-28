@@ -24,6 +24,8 @@ target Python
  * 
  * Reactions:
  *  startup: Starts the audio input stream and begins recording audio.
+ *  realtime_mode: Starts the audio input stream in realtime mode; schedules audio data to be emitted through the `audio_data` output.
+ *  recoding_mode: Starts the audio input stream in recoding mode; schedules audio data to be emitted through the `audio_data` output.
  *  send_audio_data: Emits the recorded audio data through the `audio_data` output.
  *  shutdown: Stops the audio input stream and shuts down the reactor.
 */
@@ -37,13 +39,19 @@ reactor Microphone(
   logical action realtime_mode
   logical action recoding_mode
   physical action send_audio_data
+
   output audio_data
 
   state stream
+  state q
+  state stop_recording
+  state audio_array
 
   preamble {=
     import sounddevice as sd
     import numpy as np
+    import threading
+    import queue
   =}
 
   reaction(startup) -> realtime_mode, recoding_mode {=
@@ -52,6 +60,8 @@ reactor Microphone(
       realtime_mode.schedule(0)
     elif(self.execution_mode == 1):
       print("Starting Microphone in RECORDING mode")
+      print("Press Enter to start recording")
+      input()
       recoding_mode.schedule(0)
   =}
 
@@ -76,8 +86,42 @@ reactor Microphone(
     print("#" * 50)
   =}
 
-  reaction(recoding_mode) {=
-    # TODO: Implement recoding mode
+  reaction(recoding_mode) -> send_audio_data {=
+    self.q = self.queue.Queue()
+    self.stop_recording = self.threading.Event()
+    self.audio_array = []
+
+    def recording_callback(indata, frames, time, status):
+      if status:
+        print(status)
+      self.q.put(indata.copy())
+
+    def monitor_stop():
+      input()
+      self.stop_recording.set()
+
+    with self.sd.InputStream(
+      channels=self.channels,
+      samplerate=self.sample_rate,
+      dtype=self.dtype,
+      device=self.device,
+      callback=recording_callback):
+
+      print('#' * 80)
+      print("Recording... Press Enter to stop.")
+      print('#' * 80)
+
+      stop_thread = self.threading.Thread(target=monitor_stop)
+      stop_thread.start()
+
+      while not self.stop_recording.is_set():
+        self.audio_array.append(self.q.get())
+
+      stop_thread.join()
+
+    print("Recording stopped")
+    self.audio_array = self.np.concatenate(self.audio_array)
+    send_audio_data.schedule(0, self.audio_array)
   =}
 
   reaction(send_audio_data) -> audio_data {=
