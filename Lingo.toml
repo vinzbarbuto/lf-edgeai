@@ -1,15 +1,25 @@
 [package]
 name = "EdgeAI"
-version = "0.3.0"
+version = "0.3.1"
 
 [properties]
 
+[[app]]
+name = "EdgeAI"
+main = "./src/RTAudioClassification.lf"
+target = "Python"
+platform = "Native"
+
+
 [lib]
 name = "EdgeAI"
-main = ""
+location = "./src/"
 target = "Python"
 platform = "Native"
 
 [lib.properties]
+artifacts = [
+    "./models/"
+]
 
 [dependencies]

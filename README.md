@@ -100,5 +100,4 @@ In the folder [`src/`](src/), you can find several example LF programs that demo
 - **`Natural Language Processing`**
     - [`Text Classification`](src/TextClassification.lf)
     - [`Real-Time Speech-to-Text Sentiment Analysis`](src/SentimentAnalysisSpeech.lf)
-    - [`Speech-to-Text Sentiment Analysis on Recorde Audio`](src/RecordedSentimentAnalysis.lf)
     - [`Question & Answer`](src/BertQA.lf)
