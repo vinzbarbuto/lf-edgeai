@@ -11,6 +11,5 @@ target = "Python"
 platform = "Native"
 
 [lib.properties]
-artifacts = ["./models/"]
 
 [dependencies]
