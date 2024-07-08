@@ -38,7 +38,7 @@ reactor SpeechToText {
 
   # The Vosk speech recognition model path is in the models directory of the project.
   state model_path = {=
-    self.os.path.join(self.os.getcwd(), "models", "vosk-model-small-en-us-0.15")
+    self.os.path.join(self.os.getcwd(), "models", "vosk-model")
   =}
 
   reaction(startup) {=
