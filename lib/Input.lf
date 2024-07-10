@@ -25,8 +25,6 @@ target Python
  * 
  * Reactions:
  *  startup: Starts the audio input stream and begins recording audio.
- *  realtime_mode: Starts the audio input stream in realtime mode; schedules audio data to be emitted through the `audio_data` output.
- *  recoding_mode: Starts the audio input stream in recoding mode; schedules audio data to be emitted through the `audio_data` output.
  *  send_audio_data: Emits the recorded audio data through the `audio_data` output.
  *  shutdown: Stops the audio input stream and shuts down the reactor.
 */
@@ -85,12 +83,11 @@ reactor Microphone(
  * a camera device and emitting it as an output.
  *
  * Args: 
- *  camera_id (int): The ID of the camera to use for capturing video. 
- *  offset (float): The initial offset in seconds for the start timer. 
+ *  camera_id (int): The ID of the camera to use for capturing video.
  *  fps (int): The desired frames per second for the video capture.
  *
  * Reactions: 
- *  start: Initializes the camera stream and captures the first frame. 
+ *  startup: Initializes the camera stream and captures the first frame. 
  *  trigger: Captures a new video frame and emits it through the `camera_frame` output. 
  *  shutdown: Releases the camera stream.
  *
@@ -100,11 +97,9 @@ reactor Microphone(
  * Outputs: 
  *  camera_frame: The captured video frame.
  */
-reactor Camera(camera_id=0, offset = 0 s, fps=30) {
+reactor Camera(camera_id=0, fps=30) {
   input trigger
   output camera_frame
-
-  timer start(offset)
   state stream
 
   preamble {=
@@ -112,7 +107,7 @@ reactor Camera(camera_id=0, offset = 0 s, fps=30) {
     import sys
   =}
 
-  reaction(start) -> camera_frame {=
+  reaction(startup) -> camera_frame {=
     self.stream = self.cv2.VideoCapture(self.camera_id, self.cv2.CAP_ANY)
     if (self.stream.isOpened() == False):
       self.sys.stderr.write("Error: Failed to open the camera.\n")

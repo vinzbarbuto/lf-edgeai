@@ -5,7 +5,7 @@
  * @brief Interface library for displaying and visualizing results of ML inference.
  */
 target Python {
-  files: util/utils.py
+  files: ../util/utils.py
 }
 
 /**
