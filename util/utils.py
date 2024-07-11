@@ -1,6 +1,6 @@
 import random
 import cv2
-from typing import List
+from typing import List, Tuple
 import sys
 import numpy as np
 from tflite_support.task import processor
@@ -89,13 +89,13 @@ class SegmentationUtils:
     _LEGEND_ROW_SIZE = 20  # pixels
     _LEGEND_RECT_SIZE = 16  # pixels
     _LABEL_MARGIN = 10
-    _OVERLAY_ALPHA = 0.5
+    _OVERLAY_ALPHA = 0.6
     _PADDING_WIDTH_FOR_LEGEND = 150  # pixels
 
     @staticmethod
     def segmentation_map_to_image(
         segmentation: processor.SegmentationResult,
-    ) -> tuple[np.ndarray, List[processor.ColoredLabel]]:
+    ) -> Tuple[np.ndarray, List[processor.ColoredLabel]]:
         """Convert the SegmentationResult into a RGB image.
 
         Args:
@@ -105,15 +105,12 @@ class SegmentationUtils:
             seg_map_img: The visualized segmentation result as an RGB image.
             found_colored_labels: The list of ColoredLabels found in the image.
         """
-        # Get the list of unique labels from the model output.
         masks = np.frombuffer(segmentation.category_mask, dtype=np.uint8)
         found_label_indices, inverse_map, counts = np.unique(
             masks, return_inverse=True, return_counts=True
         )
         count_dict = dict(zip(found_label_indices, counts))
 
-        # Sort the list of unique label so that the class with the most pixel comes
-        # first.
         sorted_label_indices = sorted(
             found_label_indices, key=lambda index: count_dict[index], reverse=True
         )
@@ -121,9 +118,6 @@ class SegmentationUtils:
             segmentation.colored_labels[idx] for idx in sorted_label_indices
         ]
 
-        # Convert segmentation map into RGB image of the same size as the input image.
-        # Note: We use the inverse map to avoid running the heavy loop in Python and
-        # pass it over to Numpy's C++ implementation to improve performance.
         found_colors = [item.color for item in found_colored_labels]
         output_shape = [segmentation.width, segmentation.height, 3]
         seg_map_img = (
@@ -153,9 +147,7 @@ class SegmentationUtils:
         Returns:
             Input image overlaid with segmentation result.
         """
-        # Show the input image and the segmentation map image.
         if display_mode == "overlay":
-            # Overlay mode.
             overlay = cv2.addWeighted(
                 input_image,
                 SegmentationUtils._OVERLAY_ALPHA,
@@ -164,13 +156,11 @@ class SegmentationUtils:
                 0,
             )
         elif display_mode == "side-by-side":
-            # Side by side mode.
             overlay = cv2.hconcat([input_image, segmentation_map_image])
         else:
             sys.exit(f"ERROR: Unsupported display mode: {display_mode}.")
 
-        # Show the FPS
-        fps_text = "FPS = " + str(int(fps))
+        fps_text = f"FPS: {fps:.2f}"
         text_location = (
             SegmentationUtils._FPS_LEFT_MARGIN,
             SegmentationUtils._LEGEND_ROW_SIZE,
@@ -179,20 +169,15 @@ class SegmentationUtils:
             overlay,
             fps_text,
             text_location,
-            cv2.FONT_HERSHEY_PLAIN,
+            cv2.FONT_HERSHEY_SIMPLEX,
             SegmentationUtils._LEGEND_FONT_SIZE,
             SegmentationUtils._LEGEND_TEXT_COLOR,
             SegmentationUtils._LEGEND_FONT_THICKNESS,
         )
 
-        # Initialize the origin coordinates of the label.
         legend_x = overlay.shape[1] + SegmentationUtils._LABEL_MARGIN
-        legend_y = (
-            overlay.shape[0] // SegmentationUtils._LEGEND_ROW_SIZE
-            + SegmentationUtils._LABEL_MARGIN
-        )
+        legend_y = SegmentationUtils._LABEL_MARGIN
 
-        # Expand the frame to show the label.
         overlay = cv2.copyMakeBorder(
             overlay,
             0,
@@ -204,7 +189,6 @@ class SegmentationUtils:
             SegmentationUtils._LEGEND_BACKGROUND_COLOR,
         )
 
-        # Show the label on right-side frame.
         for colored_label in colored_labels:
             rect_color = colored_label.color
             start_point = (legend_x, legend_y)
@@ -212,25 +196,19 @@ class SegmentationUtils:
                 legend_x + SegmentationUtils._LEGEND_RECT_SIZE,
                 legend_y + SegmentationUtils._LEGEND_RECT_SIZE,
             )
-            cv2.rectangle(
-                overlay,
-                start_point,
-                end_point,
-                rect_color,
-                -SegmentationUtils._LEGEND_FONT_THICKNESS,
-            )
+            cv2.rectangle(overlay, start_point, end_point, rect_color, cv2.FILLED)
 
             label_location = (
                 legend_x
                 + SegmentationUtils._LEGEND_RECT_SIZE
                 + SegmentationUtils._LABEL_MARGIN,
-                legend_y + SegmentationUtils._LABEL_MARGIN,
+                legend_y + SegmentationUtils._LEGEND_RECT_SIZE,
             )
             cv2.putText(
                 overlay,
                 colored_label.category_name,
                 label_location,
-                cv2.FONT_HERSHEY_PLAIN,
+                cv2.FONT_HERSHEY_SIMPLEX,
                 SegmentationUtils._LEGEND_FONT_SIZE,
                 SegmentationUtils._LEGEND_TEXT_COLOR,
                 SegmentationUtils._LEGEND_FONT_THICKNESS,
