@@ -85,10 +85,13 @@ reactor Microphone(
  * Args: 
  *  camera_id (int): The ID of the camera to use for capturing video.
  *  fps (int): The desired frames per second for the video capture.
+ *  offset (int): The offset in milliseconds for the camera tick timer.
+ *  period (int): The period in milliseconds for the camera tick timer. If not set, the FPS will be used instead.
  *
  * Reactions: 
  *  startup: Initializes the camera stream and captures the first frame. 
  *  trigger: Captures a new video frame and emits it through the `camera_frame` output. 
+ *  camera_tick: Captures a new video frame and emits it through the `camera_frame` output.
  *  shutdown: Releases the camera stream.
  *
  * Inputs: 
@@ -97,42 +100,57 @@ reactor Microphone(
  * Outputs: 
  *  camera_frame: The captured video frame.
  */
-reactor Camera(camera_id=0, fps=30) {
+reactor Camera(camera_id=0, fps=30, offset = 0, period=0) {
   input trigger
   output camera_frame
-  state stream
+  state capture
+  timer camera_tick(offset, period)
 
   preamble {=
     import cv2
     import sys
+
+    # Capture and return the frame
+    def capture_frame(self):
+      ret, frame = self.capture.read()
+      if ret:
+        return frame
+      else:
+        print("WARNING: Camera frame missing.") 
   =}
 
   reaction(startup) -> camera_frame {=
-    self.stream = self.cv2.VideoCapture(self.camera_id, self.cv2.CAP_ANY)
-    if (self.stream.isOpened() == False):
+    
+    self.capture = self.cv2.VideoCapture(self.camera_id, self.cv2.CAP_ANY)
+    
+    if (self.capture.isOpened() == False):
       self.sys.stderr.write("Error: Failed to open the camera.\n")
-      exit(1)
+      lf.request_stop()
 
-    self.stream.set(self.cv2.CAP_PROP_FPS, self.fps)
-
-    # Read the first frame. This is a blocking read.
-    ret, frame = self.stream.read()
-    if ret is True:
+    # If period is not set, use FPS instead of a fixed time interval
+    if(self.period <= 0):
+      # Set the FPS of the camera. If the specified FPS is not supported, 
+      # the camera will default to the closest available FPS.
+      self.capture.set(self.cv2.CAP_PROP_FPS, self.fps)
+      print("FPS set to: " + str(self.capture.get(self.cv2.CAP_PROP_FPS)))
+      # Read the first frame.
+      frame = self.capture_frame()
       camera_frame.set(frame)
-    else:
-      print("Warning, failed to get first frame.")
   =}
 
   reaction(trigger) -> camera_frame {=
     # Read a frame. This is a blocking read.
-    ret, frame = self.stream.read()
-    if ret is True:
-      camera_frame.set(frame)
-    else:
-      print("Warning, failed to get first frame.")
+    frame = self.capture_frame()
+    camera_frame.set(frame)
+  =}
+
+  reaction(camera_tick) -> camera_frame {=
+    # Read a frame. This is a blocking read.
+    frame = self.capture_frame()
+    camera_frame.set(frame)
   =}
 
   reaction(shutdown) {=
-    self.stream.release()
+    self.capture.release()
   =}
 }
