@@ -8,7 +8,7 @@
  */
 target Python
 
-import MLReactor from "../lib/AbstractReactors.lf"
+import MLReactor from "../lib/private/AbstractReactors.lf"
 
 /**
  * @brief Reactor that extends `MLReactor` performing image classification using a TensorFlow Lite model.

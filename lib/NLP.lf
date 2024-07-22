@@ -8,7 +8,7 @@
  */
 target Python
 
-import NLPReactor from "../lib/AbstractReactors.lf"
+import NLPReactor from "../lib/private/AbstractReactors.lf"
 
 /**
  * @class NLClassifier

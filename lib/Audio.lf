@@ -8,7 +8,7 @@
  */
 target Python
 
-import MLReactor from "../lib/AbstractReactors.lf"
+import MLReactor from "../lib/private/AbstractReactors.lf"
 
 /**
  *
