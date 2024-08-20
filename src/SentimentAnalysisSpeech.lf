@@ -6,8 +6,8 @@
  */
 target Python
 
-import Microphone from "../lib/Input.lf"
-import NLClassifier from "../lib/NLP.lf"
+import Microphone from "lib/Input.lf"
+import NLClassifier from "lib/NLP.lf"
 
 /**
  * The `SpeechToText` reactor is responsible for performing real-time speech recognition using the

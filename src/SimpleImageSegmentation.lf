@@ -5,7 +5,7 @@
  */
 target Python
 
-import ImageSegmenter from "../lib/ComputerVision.lf"
+import ImageSegmenter from "lib/ComputerVision.lf"
 
 /**
  * @brief Injects an image into the image segmentation pipeline.

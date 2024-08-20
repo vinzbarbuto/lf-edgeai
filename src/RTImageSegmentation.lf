@@ -8,9 +8,9 @@ target Python {
   single-threaded: true  # OpenCV crashes if we use the multithreaded version.
 }
 
-import Camera from "../lib/Input.lf"
-import SegmentationVisualizer from "../lib/Display.lf"
-import ImageSegmenter from "../lib/ComputerVision.lf"
+import Camera from "lib/Input.lf"
+import SegmentationVisualizer from "lib/Display.lf"
+import ImageSegmenter from "lib/ComputerVision.lf"
 
 /**
  * @brief This reactor tests the real-time image segmentation functionality by connecting a Camera,

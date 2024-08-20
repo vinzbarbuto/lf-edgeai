@@ -5,7 +5,7 @@
  */
 target Python
 
-import ImageClassifier from "../lib/ComputerVision.lf"
+import ImageClassifier from "lib/ComputerVision.lf"
 
 /**
  * @brief Defines an ImageInjector reactor that reads an image from a file path and outputs the

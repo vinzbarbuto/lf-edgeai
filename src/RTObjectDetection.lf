@@ -8,9 +8,9 @@ target Python {
   single-threaded: true  # OpenCV crashes if we use the multithreaded version.
 }
 
-import Camera from "../lib/Input.lf"
-import DetectionVisualizer from "../lib/Display.lf"
-import ObjectDetector from "../lib/ComputerVision.lf"
+import Camera from "lib/Input.lf"
+import DetectionVisualizer from "lib/Display.lf"
+import ObjectDetector from "lib/ComputerVision.lf"
 
 /**
  * @brief This reactor tests the object detection functionality by connecting a Camera, an

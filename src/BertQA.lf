@@ -5,7 +5,7 @@
  */
 target Python
 
-import BertQuestionAnswer from "../lib/NLP.lf"
+import BertQuestionAnswer from "lib/NLP.lf"
 
 /**
  * Defines two reactors, `Injector` and `ResultPrinter`, that work together to perform question

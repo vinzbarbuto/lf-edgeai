@@ -5,7 +5,7 @@
  */
 target Python
 
-import NLClassifier from "../lib/NLP.lf"
+import NLClassifier from "lib/NLP.lf"
 
 /**
  * The `Injector` reactor is responsible for getting text input from the user and passing it to the

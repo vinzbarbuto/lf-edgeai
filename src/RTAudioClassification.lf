@@ -5,8 +5,8 @@
  */
 target Python
 
-import Microphone from "../lib/Input.lf"
-import AudioClassifier from "../lib/Audio.lf"
+import Microphone from "lib/Input.lf"
+import AudioClassifier from "lib/Audio.lf"
 
 /**
  * @brief This reactor tests the audio classification functionality by connecting a Microphone, an
