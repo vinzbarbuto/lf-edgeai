@@ -4,7 +4,7 @@ version = "0.4.0"
 
 [lib]
 name = "EdgeAI"
-location = "./src/lib/"
+location = "./"
 target = "Python"
 platform = "Native"
 
